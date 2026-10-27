@@ -79,19 +79,23 @@ FUR = {
 }
 
 # Paws, right side (mirrored for the left), in world coordinates. Each paw is
-# one metaball mesh shaped like a mitten: a palm tilted with its inner edge up,
-# three short, fat finger bumps packed close and sloping down onto the orb's
-# lower side, and a round thumb nub on top. Low stiffness melts the bumps into
-# one lobe, and the paw fur veils what is left of them. The bumps aim at a point
+# one metaball mesh shaped like a mitten: a near-spherical palm seated against
+# the orb, three short, fat finger bumps packed close and sloping down onto the
+# orb's lower side, a round thumb nub on top, and a wrist cuff buried in the
+# forearm so the arm flows into the paw. Low stiffness melts the bumps into the
+# ball, and the paw fur veils what is left of them. The bumps aim at a point
 # just behind the orb center; the paw is then pressed softly against the orb.
 PAW = {
-    "palm": (0.60, -0.76, 1.73), "palm_radii": (0.27, 0.25, 0.28), "palm_roll": 20,
+    "palm": (0.52, -0.71, 1.735), "palm_radii": (0.26, 0.26, 0.27), "palm_roll": 0,
+    "wrist": (0.82, -0.36, 1.70), "wrist_radius": 0.11,
     "finger_target": (0, -0.88, 1.895), "finger_angles": (-10, -22, -32),
     "finger_radius": 0.10, "finger_reach": 0.335, "finger_length": 0.06,
     "thumb_base": (0.68, -0.76, 1.88), "thumb_tip": (0.63, -0.80, 1.97), "thumb_radius": 0.095,
     "stiffness": 1.6, "thumb_stiffness": 2.4, "threshold": 0.6, "resolution": 0.01,
     "contact_radius": 0.262, "contact_blend": 0.045, "bare_margin": 0.02,
     "crease_density": 1.0,
+    # Hands-pass paw area, used to share the strand budget (see main()).
+    "fur_share_area": 1.0643,
     # Paws read a little lighter than the body in the reference.
     "plush_color": "#b39888", "fur_tint": "#ecd4ca", "fur_opaque_color": "#eed8bc",
 }
@@ -440,6 +444,10 @@ def make_paw(name, sign, mat, orb_center):
     # A firmer field keeps the thumb a distinct nub on the soft mitten.
     capsule(mirrored(PAW["thumb_base"]), mirrored(PAW["thumb_tip"]), PAW["thumb_radius"],
             PAW["thumb_stiffness"])
+    if PAW.get("wrist"):
+        # A fat cuff from the palm into the forearm, so the paw flows out of the
+        # arm instead of sitting on it like a bulb on a stalk.
+        capsule(palm, mirrored(PAW["wrist"]), PAW["wrist_radius"])
 
     bpy.ops.object.select_all(action="DESELECT")
     bpy.context.view_layer.objects.active = obj
@@ -467,6 +475,8 @@ def make_paw(name, sign, mat, orb_center):
         "thumb_radius": PAW["thumb_radius"], "metaball_resolution": PAW["resolution"],
         "metaball_stiffness": PAW["stiffness"], "thumb_stiffness": PAW["thumb_stiffness"],
         "orb_contact": {"radius": radius, "smooth_max_blend": blend},
+        "wrist_cuff": [list(palm), list(mirrored(PAW["wrist"]))] if PAW.get("wrist") else None,
+        "wrist_radius": PAW.get("wrist_radius"),
     })
 
 
@@ -1022,6 +1032,10 @@ def main():
         if obj.type == "MESH" and tuple(obj.scale) != (1, 1, 1):
             bake_scale(obj)
     areas = {obj.name: surface_area(obj) for obj in furred}
+    # The paws share the budget by a fixed area, so reshaping them does not
+    # move strands between the other parts.
+    shares = {name: PAW["fur_share_area"] if name.startswith("Hand") else area
+              for name, area in areas.items()}
     total_parents = FUR["children_total"] // FUR["children_per_parent"]
 
     def body_weight(co):
@@ -1064,13 +1078,14 @@ def main():
         t = t * t * (3 - 2 * t)
         return (FUR["length"] + (FUR["head_length"] - FUR["length"]) * t) / FUR["length"]
 
-    def unburied(weight):
+    def unburied(weight, host=body):
         # Arm and leg roots inside the body grow out through it as stray tufts
-        # at the shoulders and the belly-leg junction.
-        to_body = body.matrix_world.inverted()
+        # at the shoulders and the belly-leg junction; so would paw roots on the
+        # wrist cuff inside the forearm.
+        to_host = host.matrix_world.inverted()
         def combined(co):
-            local = to_body @ co
-            hit, location, normal, _ = body.closest_point_on_mesh(local)
+            local = to_host @ co
+            hit, location, normal, _ = host.closest_point_on_mesh(local)
             if hit and (local - location).dot(normal) < -FUR["buried_margin"]:
                 return 0.0
             return weight(co) if weight else 1.0
@@ -1096,19 +1111,23 @@ def main():
         return lambda co: value / FUR["length"]
 
     for obj in furred:
-        parents = int(total_parents * areas[obj.name] / sum(areas.values()))
+        parents = int(total_parents * shares[obj.name] / sum(shares.values()))
         if obj is body:
             weight, length = body_weight, body_length
         elif obj.name.startswith("Foot"):
             weight, length = foot_weight, leg_length
         elif obj.name.startswith("Hand"):
-            weight, length = paw_weight(PAW_FINGERS[obj.name]), constant(FUR["paw_length"])
+            arm = bpy.data.objects["Arm " + obj.name.split()[-1]]
+            weight = unburied(paw_weight(PAW_FINGERS[obj.name]), arm)
+            length = constant(FUR["paw_length"])
         else:
             weight, length = None, arm_length
         if obj.name.startswith(("Arm", "Foot")):
             weight = unburied(weight)
         add_fur(obj, paw_fur if obj.name.startswith("Hand") else fur, parents, weight, length)
         FUR_SYSTEMS[obj.name]["surface_area_m2"] = round(areas[obj.name], 4)
+        if shares[obj.name] != areas[obj.name]:
+            FUR_SYSTEMS[obj.name]["budget_area_m2"] = shares[obj.name]
     for obj in furred:
         if obj.name.startswith("Hand"):
             comb_fur(obj, toward=Vector(PAW["finger_target"]), lift=FUR["paw_lift"])

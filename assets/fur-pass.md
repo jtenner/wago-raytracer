@@ -534,3 +534,74 @@ The renders took 25.7 s each on Cycles CUDA (RTX 4060 Laptop GPU), at 512 sample
 4. **The soft cast shadow under the paws onto the belly and orb glow is fainter than the reference's.** The geometry casts it, but the reference's darker crescent comes from its lighting, which was not touched.
 5. **The strand distribution moved slightly.** The 300k budget is split across parts by surface area (unchanged code). The taller paws gained area: the paws went from 122 to 128 parents each. Body went from 1,916 to 1,908 (−0.4%), and each arm and foot lost 1 parent (−100 strands). The total, and every fur setting except paw length, is unchanged; stray and region colors stayed at noise level. To hold the other counts exactly, the allocation would need to pin non-paw parent counts. That is a change outside the paws, so it is left for the owner.
 6. **Not touched:** `mascot.obj/.mtl` (still the fur-pass hands), the orb (its rendered size remains smaller than the reference's), and all the taming-pass residuals above.
+
+## Mitten shape pass
+
+The owner's note on the hands pass was that the convex mitten should be a bit more round, and should protrude less from the wrist. This pass changes only the paw mesh's shape. Every fur setting and count, the paw fur length and density, the paw materials, the digit bumps (angles, radius, length and reach), the thumb, the orb contact settings, and everything outside the paws are held at the hands-pass values.
+
+`paw-closeup.png` shows the final render's paw region (u −0.33…0.33, v 0.38…0.64 of figure height) above the same region of the reference, both 1200 px wide at matched figure scale.
+
+### Diagnosis
+
+With the fur hidden (Workbench renders from the camera, top, side and below), the hands-pass paw was a **gourd**. A big palm ball carried the thumb. Then came a waist, then a narrower finger lobe at the orb: the bumps formed a slab only about 0.2 m thick in depth, against the palm's 0.5 m. The palm was stuck onto the inner face of the arm ellipsoid. The arm's lower tip (z 1.39) hung below and outside the paw (bottom z 1.45). Under fur, this reads as a bulb on the end of an arm that narrows at the wrist: the waist, the notch under the paw where the arm tip continues, and a dip between the thumb and the arm.
+
+### What changed
+
+| | Hands pass | Mitten shape pass |
+|---|---|---|
+| Palm center (right paw; mirrored) | (0.60, −0.76, 1.73) | **(0.52, −0.71, 1.735)**: 0.08 toward the orb and 0.05 back toward the arm |
+| Palm radii | (0.27, 0.25, 0.28), rolled 20° | **(0.26, 0.26, 0.27), no roll**: near-spherical |
+| Wrist cuff | none | **new capsule** from the palm center to (0.82, −0.36, 1.70) inside the forearm, r 0.11, at the paw stiffness 1.6 |
+| Paw fur on the cuff | – | roots buried in the arm get no fur (the existing `unburied` filter, now with the arm as host), so no strands grow through the forearm |
+| Strand budget | split by surface area | split by surface area, but the paws count with a fixed **1.0643 m²** (`fur_share_area`, the hands-pass paw area). The buried cuff adds area that would otherwise pull strands from the body, arms and feet |
+
+Unchanged: finger target, angles (−10/−22/−32°), radius 0.10, length 0.06 and reach 0.335 (the tips are identical); thumb; stiffness 1.6 / thumb 2.4; contact radius 0.262, squash blend 0.045, bare margin 0.02; crease density; paw fur length 0.06 m and paw lift; paw materials. `scene.json` records the cuff (`wrist_cuff`, `wrist_radius`) and each paw's `budget_area_m2`.
+
+Paw geometry (right paw, from the metaball mesh; "visible" means outside the arm):
+
+| Measure | Hands pass | Mitten shape pass |
+|---|---|---|
+| Visible width, x | 0.183…0.871 (0.688 m) | **0.179…0.827 (0.648 m)** |
+| Visible height without the thumb, z | 1.451…1.995 (0.544 m) | **1.465…2.004 (0.539 m)** |
+| Width / height | 1.26 | **1.20** |
+| Depth (y) at x 0.30 / 0.35 / 0.40 / 0.45 / 0.50 | 0.29 / 0.36 / 0.41 / 0.44 / 0.47: the waist toward the orb | **0.45 / 0.50 / 0.52 / 0.52 / 0.52**: no waist |
+| Visible fur area (outside the arm and the bare pad) | 1.0205 m² | **1.0234 m²** (+0.3%), so with 128 parents the paw fur density is unchanged |
+| Front reach (smallest x of the paw in front of the orb center) | 0.196 | **0.194** |
+| Mesh vertices on the orb contact sphere | 300 | **335**: the same squash settings on a fuller front |
+
+### Compare-and-fix log
+
+Shape changes were first screened in a fur-free Workbench harness that imports `make_paw` from the script (variants g1–g20), so each full render tested one considered change. Four full 512-sample Cycles GPU renders followed (cycles 1–4), plus the final build in `assets/`. Each cycle was compared with the reference in a matched-scale crop of the paw region, and with the hands pass in a stacked crop, and the differences were written down before the next change. Luminance is the mean of 0.05H boxes at (∓0.19, 0.52), the paw tops, and the belly at (0, 0.70). With these boxes, the reference reads **168 / 207 / 181**.
+
+| Cycle | Change | Paw L / R / belly | What the crop showed |
+|---|---|---|---|
+| 0 | hands pass, as committed | 185 / 195 / 166 | Bulb on a stalk: the gourd waist between palm and finger lobe, a notch under the paw where the arm tip continues, and a dip between the thumb and the arm. Wider than tall |
+| – | harness only: palm moved toward the orb, no cuff (g1) | – | The palm pulled off the arm and the waist remained. Rejected |
+| 1 | palm (0.56, −0.70, 1.72), r 0.28 sphere, no roll; cuff to (0.86, −0.34, 1.72), r 0.13 | 178 / 196 / 166 | One mass; the waist is gone, and the arm's outer edge runs into the paw with no notch. But the paw is too big and low (bottom v ≈ 0.613 vs the reference's 0.595). The thumb is absorbed into the taller palm, and it still tapers toward the orb |
+| 2 | palm (0.55, −0.71, 1.745), r 0.265/0.265/0.255; cuff end z 1.74 | 171 / 195 / 166 | Smooth wrist on both sides; a rounded top. Still a wedge narrowing toward the orb. A pointed tuft on the left thumb: with the palm top lowered, the thumb stood proud and its tip fur came to a point |
+| 3 | palm (0.52, −0.71, 1.735), r 0.26/0.26/0.27 | 168 / 196 / 166 | The paw meets the orb at full height, and the thumbs are rounded nubs again. But the cuff, and its lighter paw fur, filled the paw's outer outline into the arm, so paw plus wrist read as a wedge widening toward the arm |
+| – | harness only: cuff aimed at the arm's lower tip to swallow it (g16, g17) | – | Merged in side view, but from the front it stretched the paw diagonally into an egg. Rejected |
+| **4 = final** | cuff smaller and deeper: end (0.82, −0.36, 1.70), r 0.11 | **166 / 193 / 166** | Each paw has its own rounded outline, more compact than the hands pass. The arm flows into the outer bottom with no notch or neck, and the top-outer junction is a soft dip, not a stalk. The inner edge touches the orb with fur to the glass, and no strands show inside the orb at 4× zoom |
+
+The final build in `assets/` matches cycle 4: same scene data, same luminance. A few hundred paw-region pixels differ by more than 20 levels, from run-to-run variation in hair placement.
+
+### Anchors, hands pass → final
+
+| Measure | Hands pass | Mitten shape pass |
+|---|---|---|
+| Parents body / arm / paw / foot | 1908 / 154 / 128 / 263 | **1908 / 154 / 128 / 263** |
+| Total rendered strands | 299,800 | **299,800** |
+| Figure top / bottom row, height | 67 / 678, 0.797 by this pass's row measure (0.798 strict in the hands-pass notes) | **67 / 678, unchanged** |
+| Pixels outside the paw box (\|u\| < 0.36, 0.36 < v < 0.68) | – | mean difference 0.23, max 19, none above 20: render noise only |
+| `mascot.obj/.mtl` | – | not regenerated (`MUSE_SKIP_OBJ=1`; checksums unchanged) |
+
+The renders took 26 s each on Cycles CUDA (RTX 4060 Laptop GPU), at 512 samples.
+
+### Residuals
+
+1. **The lower inner corner still rises toward the orb.** The digit bumps slope down onto the orb's lower side at the fixed fan angles. So the paw's underside climbs from about v 0.60 at the middle to about 0.57 where it meets the glass, and the paw still narrows slightly into the orb. In the reference, the underside is a full round curve meeting the orb low. Fixing it would change the bump angles, which this pass was told to hold.
+2. **The paw bottom is still slightly low:** about v 0.60–0.61 against the reference's 0.595. Part of that is the arm's lower tip (z 1.39), which sits under the paw's outer bottom and cannot move in a paw-only pass.
+3. **The left thumb nub is weaker than the right.** Both read as rounded nubs; the left has less of a notch than the reference's.
+4. **Paw tone shifted with the shape, not the materials.** Without the 20° roll, the left paw's top faces the key light less: 185 → 166 in the box (reference 168). The right paw is 195 → 193 (reference 207). Paw materials and fur colors are unchanged. The lit-right vs shaded-left contrast is now closer to the reference, but the right paw is still darker than the reference's.
+5. **The orb contact patch is fuller:** 335 vs 300 vertices on the contact sphere. The squash settings are unchanged, and in the render the press still reads as soft, with no flattened pad.
+6. **Not touched:** the arm ellipsoid (its long lower tip is the main remaining source of the low outer bottom), the orb, lighting, the OBJ export, and all earlier residuals.
