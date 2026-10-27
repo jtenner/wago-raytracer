@@ -1,0 +1,62 @@
+// Named imports from wago-vulkan ABI version 1.
+#![allow(non_snake_case)]
+use core::ffi::c_void;
+#[link(wasm_import_module = "vulkan.wasm32")]
+extern "C" {
+    pub fn abiVersion() -> i32;
+    pub fn vkCreateInstance(a0: *const c_void, a1: *const c_void, a2: *mut u64) -> i32;
+    pub fn vkEnumeratePhysicalDevices(a0: u64, a1: *mut u32, a2: *mut u64) -> i32;
+    pub fn vkGetPhysicalDeviceProperties(a0: u64, a1: *mut c_void) -> ();
+    pub fn vkGetPhysicalDeviceQueueFamilyProperties(a0: u64, a1: *mut u32, a2: *mut c_void) -> ();
+    pub fn vkGetPhysicalDeviceMemoryProperties(a0: u64, a1: *mut c_void) -> ();
+    pub fn vkCreateDevice(a0: u64, a1: *const c_void, a2: *const c_void, a3: *mut u64) -> i32;
+    pub fn vkGetDeviceQueue(a0: u64, a1: u32, a2: u32, a3: *mut u64) -> ();
+    pub fn vkCreateBuffer(a0: u64, a1: *const c_void, a2: *const c_void, a3: *mut u64) -> i32;
+    pub fn vkGetBufferMemoryRequirements(a0: u64, a1: u64, a2: *mut c_void) -> ();
+    pub fn vkAllocateMemory(a0: u64, a1: *const c_void, a2: *const c_void, a3: *mut u64) -> i32;
+    pub fn vkBindBufferMemory(a0: u64, a1: u64, a2: u64, a3: u64) -> i32;
+    pub fn vkMapMemory(a0: u64, a1: u64, a2: u64, a3: u64, a4: u32, a5: *mut u64) -> i32;
+    pub fn writeMapped(a0: u64, a1: *const c_void, a2: u32) -> ();
+    pub fn readMapped(a0: u64, a1: *mut c_void, a2: u32) -> ();
+    pub fn vkUnmapMemory(a0: u64, a1: u64) -> ();
+    pub fn vkCreateImage(a0: u64, a1: *const c_void, a2: *const c_void, a3: *mut u64) -> i32;
+    pub fn vkGetImageMemoryRequirements(a0: u64, a1: u64, a2: *mut c_void) -> ();
+    pub fn vkBindImageMemory(a0: u64, a1: u64, a2: u64, a3: u64) -> i32;
+    pub fn vkCreateImageView(a0: u64, a1: *const c_void, a2: *const c_void, a3: *mut u64) -> i32;
+    pub fn vkCreateRenderPass(a0: u64, a1: *const c_void, a2: *const c_void, a3: *mut u64) -> i32;
+    pub fn vkCreateFramebuffer(a0: u64, a1: *const c_void, a2: *const c_void, a3: *mut u64) -> i32;
+    pub fn vkCreateShaderModule(a0: u64, a1: *const c_void, a2: *const c_void, a3: *mut u64) -> i32;
+    pub fn vkCreateDescriptorSetLayout(a0: u64, a1: *const c_void, a2: *const c_void, a3: *mut u64) -> i32;
+    pub fn vkCreatePipelineLayout(a0: u64, a1: *const c_void, a2: *const c_void, a3: *mut u64) -> i32;
+    pub fn vkCreateGraphicsPipelines(a0: u64, a1: u64, a2: u32, a3: *const c_void, a4: *const c_void, a5: *mut u64) -> i32;
+    pub fn vkCreateDescriptorPool(a0: u64, a1: *const c_void, a2: *const c_void, a3: *mut u64) -> i32;
+    pub fn vkAllocateDescriptorSets(a0: u64, a1: *const c_void, a2: *mut u64) -> i32;
+    pub fn vkUpdateDescriptorSets(a0: u64, a1: u32, a2: *const c_void, a3: u32, a4: *const c_void) -> ();
+    pub fn vkCreateCommandPool(a0: u64, a1: *const c_void, a2: *const c_void, a3: *mut u64) -> i32;
+    pub fn vkAllocateCommandBuffers(a0: u64, a1: *const c_void, a2: *mut u64) -> i32;
+    pub fn vkBeginCommandBuffer(a0: u64, a1: *const c_void) -> i32;
+    pub fn vkCmdBeginRenderPass(a0: u64, a1: *const c_void, a2: u32) -> ();
+    pub fn vkCmdBindPipeline(a0: u64, a1: u32, a2: u64) -> ();
+    pub fn vkCmdBindDescriptorSets(a0: u64, a1: u32, a2: u64, a3: u32, a4: u32, a5: *const c_void, a6: u32, a7: *const c_void) -> ();
+    pub fn vkCmdDraw(a0: u64, a1: u32, a2: u32, a3: u32, a4: u32) -> ();
+    pub fn vkCmdEndRenderPass(a0: u64) -> ();
+    pub fn vkCmdPipelineBarrier(a0: u64, a1: u32, a2: u32, a3: u32, a4: u32, a5: *const c_void, a6: u32, a7: *const c_void, a8: u32, a9: *const c_void) -> ();
+    pub fn vkCmdCopyImageToBuffer(a0: u64, a1: u64, a2: u32, a3: u64, a4: u32, a5: *const c_void) -> ();
+    pub fn vkEndCommandBuffer(a0: u64) -> i32;
+    pub fn vkQueueSubmit(a0: u64, a1: u32, a2: *const c_void, a3: u64) -> i32;
+    pub fn vkDeviceWaitIdle(a0: u64) -> i32;
+    pub fn vkDestroyCommandPool(a0: u64, a1: u64, a2: *const c_void) -> ();
+    pub fn vkDestroyDescriptorPool(a0: u64, a1: u64, a2: *const c_void) -> ();
+    pub fn vkDestroyPipeline(a0: u64, a1: u64, a2: *const c_void) -> ();
+    pub fn vkDestroyPipelineLayout(a0: u64, a1: u64, a2: *const c_void) -> ();
+    pub fn vkDestroyDescriptorSetLayout(a0: u64, a1: u64, a2: *const c_void) -> ();
+    pub fn vkDestroyShaderModule(a0: u64, a1: u64, a2: *const c_void) -> ();
+    pub fn vkDestroyFramebuffer(a0: u64, a1: u64, a2: *const c_void) -> ();
+    pub fn vkDestroyRenderPass(a0: u64, a1: u64, a2: *const c_void) -> ();
+    pub fn vkDestroyImageView(a0: u64, a1: u64, a2: *const c_void) -> ();
+    pub fn vkDestroyImage(a0: u64, a1: u64, a2: *const c_void) -> ();
+    pub fn vkDestroyBuffer(a0: u64, a1: u64, a2: *const c_void) -> ();
+    pub fn vkFreeMemory(a0: u64, a1: u64, a2: *const c_void) -> ();
+    pub fn vkDestroyDevice(a0: u64, a1: *const c_void) -> ();
+    pub fn vkDestroyInstance(a0: u64, a1: *const c_void) -> ();
+}

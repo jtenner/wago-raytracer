@@ -1,0 +1,103 @@
+{
+  "scene": "postcard",
+  "device": "llvmpipe (LLVM 19.1.7, 256 bits)",
+  "device_type": 4,
+  "execution": "software Vulkan",
+  "guest_sha256": "94d9a403be64b71c147bffac9a5ea384a13d2ee6d5ebf470e16c613b354960a6",
+  "wago": "v0.1.0-beta.11.0.20260930161037-9b0d97efdc76",
+  "wago_vulkan": "v0.1.1",
+  "width": 640,
+  "height": 400,
+  "distinct_colors": 12539,
+  "nonblack_pixels": 256000,
+  "samples": [
+    {
+      "label": "sky",
+      "x": 319,
+      "y": 42,
+      "rgba": [
+        187,
+        213,
+        178,
+        255
+      ]
+    },
+    {
+      "label": "ground",
+      "x": 314,
+      "y": 258,
+      "rgba": [
+        130,
+        140,
+        65,
+        255
+      ]
+    },
+    {
+      "label": "matte",
+      "x": 227,
+      "y": 188,
+      "rgba": [
+        190,
+        86,
+        44,
+        255
+      ]
+    },
+    {
+      "label": "metal",
+      "x": 432,
+      "y": 207,
+      "rgba": [
+        171,
+        184,
+        169,
+        255
+      ]
+    },
+    {
+      "label": "glass",
+      "x": 314,
+      "y": 201,
+      "rgba": [
+        128,
+        149,
+        89,
+        255
+      ]
+    },
+    {
+      "label": "metal_reflects_sky",
+      "x": 435,
+      "y": 181,
+      "rgba": [
+        126,
+        163,
+        121,
+        255
+      ]
+    },
+    {
+      "label": "metal_reflects_ground",
+      "x": 435,
+      "y": 236,
+      "rgba": [
+        124,
+        130,
+        67,
+        255
+      ]
+    },
+    {
+      "label": "metal_reflects_glass",
+      "x": 377,
+      "y": 204,
+      "rgba": [
+        87,
+        58,
+        43,
+        255
+      ]
+    }
+  ]
+}
