@@ -59,13 +59,13 @@ def material(name, hex_color, roughness, *, emission=0, texture=False,
         noise.inputs["Roughness"].default_value = 0.7
         links.new(coord.outputs["Object"], noise.inputs["Vector"])
         bump = nodes.new("ShaderNodeBump")
-        bump.inputs["Strength"].default_value = 0.24
+        bump.inputs["Strength"].default_value = 0.4
         bump.inputs["Distance"].default_value = 0.018
         links.new(noise.outputs["Fac"], bump.inputs["Height"])
         links.new(bump.outputs["Normal"], shader.inputs["Normal"])
         spec["surface_texture"] = {
             "type": "noise_bump", "coordinates": "object", "scale": 125,
-            "detail": 2, "roughness": 0.7, "strength": 0.24, "distance": 0.018,
+            "detail": 2, "roughness": 0.7, "strength": 0.4, "distance": 0.018,
         }
     MATERIALS[name] = spec
     return mat
@@ -172,37 +172,86 @@ def make_body(mat):
     })
 
 
+def soften_edges(mat):
+    # Fade the material out toward its rim so blush reads as airbrushed, not a decal.
+    nodes, links = mat.node_tree.nodes, mat.node_tree.links
+    shader, output = nodes.get("Principled BSDF"), nodes.get("Material Output")
+    coord = nodes.new("ShaderNodeTexCoord")
+    # Distance in the local X/Z plane, so the fade is radial as seen from the front.
+    flatten = nodes.new("ShaderNodeVectorMath")
+    flatten.operation = "MULTIPLY"
+    flatten.inputs[1].default_value = (1, 0, 1)
+    links.new(coord.outputs["Object"], flatten.inputs[0])
+    distance = nodes.new("ShaderNodeVectorMath")
+    distance.operation = "LENGTH"
+    links.new(flatten.outputs["Vector"], distance.inputs[0])
+    ramp = nodes.new("ShaderNodeMapRange")
+    ramp.inputs["From Min"].default_value = 0.25
+    ramp.inputs["From Max"].default_value = 0.95
+    ramp.inputs["To Min"].default_value = 1
+    ramp.inputs["To Max"].default_value = 0
+    links.new(distance.outputs["Value"], ramp.inputs["Value"])
+    clear = nodes.new("ShaderNodeBsdfTransparent")
+    mix = nodes.new("ShaderNodeMixShader")
+    links.new(ramp.outputs["Result"], mix.inputs["Fac"])
+    links.new(clear.outputs["BSDF"], mix.inputs[1])
+    links.new(shader.outputs["BSDF"], mix.inputs[2])
+    links.new(mix.outputs["Shader"], output.inputs["Surface"])
+    MATERIALS[mat.name]["edge_fade"] = {
+        "type": "radial_alpha_xz", "coordinates": "object",
+        "opaque_within": 0.25, "clear_beyond": 0.95,
+    }
+
+
 def make_nebula():
-    mat = material("Nebula purple blue pink", "#9568ed", 0.42, emission=1.35)
+    mat = material("Nebula purple blue pink", "#9568ed", 0.42, emission=1.1)
     nodes, links = mat.node_tree.nodes, mat.node_tree.links
     shader = nodes.get("Principled BSDF")
     coord = nodes.new("ShaderNodeTexCoord")
     warp = nodes.new("ShaderNodeTexNoise")
-    warp.inputs["Scale"].default_value = 3.8
+    warp.inputs["Scale"].default_value = 1.7
     warp.inputs["Detail"].default_value = 4
     warp.inputs["Roughness"].default_value = 0.7
     links.new(coord.outputs["Generated"], warp.inputs["Vector"])
     cloud = nodes.new("ShaderNodeTexNoise")
-    cloud.inputs["Scale"].default_value = 4.2
+    cloud.inputs["Scale"].default_value = 2.3
     cloud.inputs["Detail"].default_value = 3
     cloud.inputs["Roughness"].default_value = 0.65
     links.new(warp.outputs["Color"], cloud.inputs["Vector"])
     ramp = nodes.new("ShaderNodeValToRGB")
-    stops = [(0.20, "#21114a"), (0.35, "#4a23b8"), (0.44, "#d739c0"),
-             (0.51, "#5634e8"), (0.58, "#1688e3"), (0.70, "#61e5f2")]
+    stops = [(0.22, "#1a0b4f"), (0.36, "#3b1fd0"), (0.44, "#e02fb8"),
+             (0.51, "#4a2cf0"), (0.59, "#0b6fe8"), (0.70, "#3fd2f5")]
     ramp.color_ramp.elements.remove(ramp.color_ramp.elements[1])
     for index, (position, color) in enumerate(stops):
         element = ramp.color_ramp.elements[0] if index == 0 else ramp.color_ramp.elements.new(position)
         element.position = position
         element.color = (*rgb(color), 1)
     links.new(cloud.outputs["Fac"], ramp.inputs["Fac"])
-    links.new(ramp.outputs["Color"], shader.inputs["Base Color"])
-    links.new(ramp.outputs["Color"], shader.inputs["Emission Color"])
+    # Keep the surface itself dark so studio light cannot wash the nebula to pastel.
+    shader.inputs["Base Color"].default_value = (*rgb("#0d0a1c"), 1)
+    # A white-hot rim, as in the reference, from a facing falloff added to the emission.
+    facing = nodes.new("ShaderNodeLayerWeight")
+    facing.inputs["Blend"].default_value = 0.5
+    rim = nodes.new("ShaderNodeValToRGB")
+    rim.color_ramp.elements[0].position = 0.5
+    rim.color_ramp.elements[1].position = 0.95
+    rim.color_ramp.elements[1].color = (*rgb("#f2e6ff"), 1)
+    links.new(facing.outputs["Facing"], rim.inputs["Fac"])
+    add = nodes.new("ShaderNodeMix")
+    add.data_type = "RGBA"
+    add.blend_type = "ADD"
+    add.inputs["Factor"].default_value = 1
+    links.new(ramp.outputs["Color"], add.inputs["A"])
+    links.new(rim.outputs["Color"], add.inputs["B"])
+    links.new(add.outputs["Result"], shader.inputs["Emission Color"])
     MATERIALS[mat.name]["procedural_color"] = {
         "type": "warped_noise_color_ramp", "coordinates": "generated",
-        "warp": {"scale": 3.8, "detail": 4, "roughness": 0.7},
-        "noise": {"scale": 4.2, "detail": 3, "roughness": 0.65},
+        "drives": "emission_color", "base_color_srgb_hex": "#0d0a1c",
+        "warp": {"scale": 1.7, "detail": 4, "roughness": 0.7},
+        "noise": {"scale": 2.3, "detail": 3, "roughness": 0.65},
         "stops": [{"position": p, "color": list(rgb(c)), "srgb_hex": c} for p, c in stops],
+        "rim": {"type": "layer_weight_facing_add", "blend": 0.5, "from": 0.5, "to": 0.95,
+                "color_srgb_hex": "#f2e6ff"},
     }
     return mat
 
@@ -255,7 +304,7 @@ def write_scene(scene, camera, target):
                    "fov_horizontal_degrees": math.degrees(fov_x),
                    "fov_vertical_degrees": math.degrees(fov_y),
                    "near": camera.data.clip_start, "far": camera.data.clip_end},
-        "world": {"color": list(rgb("#cdd1d7")), "strength": 0.35},
+        "world": {"color": list(rgb("#f4f3f7")), "strength": 1.2},
         "render": {"engine": "CYCLES", "device": "CPU", "samples": scene.cycles.samples,
                    "seed": 17, "denoise": False, "adaptive_threshold": scene.cycles.adaptive_threshold,
                    "width": scene.render.resolution_x, "height": scene.render.resolution_y,
@@ -306,35 +355,36 @@ def main():
     scene.view_settings.look = "AgX - Medium High Contrast"
     scene.view_settings.exposure = 0
 
-    plush = material("Warm beige plush", "#d9c6b2", 0.91, texture=True, sheen=0.32)
-    cream = material("Pale cream face", "#f2ddc9", 0.84, sheen=0.15)
+    plush = material("Warm beige plush", "#c9a07e", 0.91, texture=True, sheen=1.0)
+    cream = material("Pale cream face", "#f6c9a6", 0.84, sheen=0.15)
     eye = material("Glossy black eyes", "#101015", 0.13)
     smile = material("Soft dark smile", "#2c2025", 0.6)
-    cheek = material("Soft rose cheeks", "#e8b3a6", 0.94)
+    cheek = material("Soft rose cheeks", "#f0a59a", 0.94)
+    soften_edges(cheek)
     glint = material("Eye catchlight", "#ffffff", 0.24, emission=0.15)
-    ground = material("Soft white ground", "#ecebea", 0.94)
+    ground = material("Soft white ground", "#f6f5f8", 0.94)
     shell = material("Orb clear glass", "#f7f5ff", 0.055, transmission=1, ior=1.16)
-    shell.node_tree.nodes.get("Principled BSDF").inputs["Coat Weight"].default_value = 0.25
-    MATERIALS[shell.name]["coat_weight"] = 0.25
+    shell.node_tree.nodes.get("Principled BSDF").inputs["Coat Weight"].default_value = 0.08
+    MATERIALS[shell.name]["coat_weight"] = 0.08
     nebula = make_nebula()
-    violet = material("Violet light filament", "#dc83ff", 0.4, emission=3)
-    blue = material("Blue light filament", "#63d7ff", 0.4, emission=3)
+    violet = material("Pink light filament", "#ff6fd8", 0.4, emission=5)
+    blue = material("Cyan light filament", "#45e0ff", 0.4, emission=5)
 
     make_body(plush)
-    sphere("Face", (0, -0.545, 2.69), (0.70, 0.17, 0.535), cream)
+    sphere("Face", (0, -0.545, 2.69), (0.62, 0.17, 0.49), cream)
     for sign, side in [(-1, "Left"), (1, "Right")]:
         sphere("Eye " + side, (sign * 0.285, -0.714, 2.745), (0.071, 0.046, 0.082), eye)
         sphere("Catchlight " + side, (sign * 0.285 - 0.018, -0.756, 2.774),
                (0.018, 0.010, 0.019), glint, 24, 16)
-        sphere("Cheek " + side, (sign * 0.433, -0.686, 2.58), (0.102, 0.017, 0.067), cheek)
+        sphere("Cheek " + side, (sign * 0.37, -0.686, 2.58), (0.12, 0.02, 0.08), cheek)
         arm = sphere("Arm " + side, (sign * 0.855, -0.245, 1.89),
                      (0.265, 0.29, 0.53), plush)
         # Align the long axis from the hand to the shoulder.
         axis = Vector((sign * 0.03, 0.39, 0.67))
         arm.rotation_euler = axis.to_track_quat("Z", "Y").to_euler()
-        sphere("Hand " + side, (sign * 0.645, -0.745, 1.66), (0.335, 0.30, 0.285), plush)
-        sphere("Thumb " + side, (sign * 0.50, -0.743, 1.86), (0.125, 0.17, 0.17), plush)
-        sphere("Foot " + side, (sign * 0.43, -0.075, 0.205), (0.325, 0.43, 0.205), plush)
+        sphere("Hand " + side, (sign * 0.575, -0.745, 1.64), (0.335, 0.30, 0.285), plush)
+        sphere("Thumb " + side, (sign * 0.42, -0.76, 1.83), (0.125, 0.17, 0.17), plush)
+        sphere("Foot " + side, (sign * 0.40, -0.06, 0.30), (0.29, 0.32, 0.30), plush)
 
     smile_points = []
     for i in range(49):
@@ -342,22 +392,23 @@ def main():
         smile_points.append((x, -0.716, 2.427 + 0.041 * (x / 0.105) ** 2))
     tube("Smile", smile_points, 0.0115, smile)
 
-    orb_center = Vector((0, -0.91, 1.94))
-    sphere("Orb nebula core", orb_center, (0.306,) * 3, nebula, 96, 64)
-    sphere("Orb glass shell", orb_center, (0.35,) * 3, shell, 96, 64)
-    # Thin, irregular luminous paths just outside the core, inside the glass.
-    for index in range(5):
+    orb_center = Vector((0, -0.93, 1.88))
+    sphere("Orb nebula core", orb_center, (0.225,) * 3, nebula, 96, 64)
+    sphere("Orb glass shell", orb_center, (0.255,) * 3, shell, 96, 64)
+    # Thin, irregular luminous wisps just outside the core, inside the glass.
+    for index in range(14):
         points = []
-        for step in range(161):
-            t = step / 160
-            latitude = -1.22 + 2.44 * t
-            longitude = index * 2 * math.pi / 5 + t * 5.0 + 0.30 * math.sin(t * 19 + index)
-            radius = 0.311 + 0.002 * math.sin(t * 31 + index)
+        phase = index * 2.399
+        for step in range(121):
+            t = step / 120
+            latitude = 1.2 * math.sin(phase * 1.7 + t * 2.3) + 0.12 * math.sin(t * 13 + 3 * index)
+            longitude = phase + t * 2.6 + 0.35 * math.sin(t * 17 + index)
+            radius = 0.229 + 0.002 * math.sin(t * 31 + index)
             point = orb_center + radius * Vector((
                 math.cos(latitude) * math.cos(longitude),
                 math.cos(latitude) * math.sin(longitude), math.sin(latitude)))
             points.append(tuple(point))
-        tube("Nebula filament %02d" % (index + 1), points, 0.0038,
+        tube("Nebula filament %02d" % (index + 1), points, 0.0026,
              violet if index % 2 == 0 else blue, 3)
 
     bpy.ops.mesh.primitive_plane_add(size=200, location=(0, 0, -0.008))
@@ -384,15 +435,15 @@ def main():
     world = bpy.data.worlds.new("Neutral light gray world")
     scene.world = world
     world.use_nodes = True
-    world.node_tree.nodes["Background"].inputs["Color"].default_value = (*rgb("#cdd1d7"), 1)
-    world.node_tree.nodes["Background"].inputs["Strength"].default_value = 0.35
+    world.node_tree.nodes["Background"].inputs["Color"].default_value = (*rgb("#f4f3f7"), 1)
+    world.node_tree.nodes["Background"].inputs["Strength"].default_value = 1.2
     area("Key softbox", (-3.3, -4.2, 6.0), (0, 0, 1.9), 440, 4.0, "#fff4e9")
     area("Fill softbox", (3.2, -2.2, 3.6), (0, 0, 1.8), 180, 3.4, "#e9f1ff")
     area("Rim softbox", (0.7, 2.6, 5.1), (0, 0, 2.1), 340, 3.0, "#fff8f0")
     light_data = bpy.data.lights.new("Orb violet spill", "POINT")
-    light_data.energy = 7
+    light_data.energy = 16
     light_data.color = rgb("#b579ff")
-    light_data.shadow_soft_size = 0.19
+    light_data.shadow_soft_size = 0.14
     light_data.use_shadow = False
     light = bpy.data.objects.new("Orb violet spill", light_data)
     bpy.context.collection.objects.link(light)
@@ -404,7 +455,7 @@ def main():
     camera.location = (0.35, -7.8, 3.13)
     target = (0, -0.03, 1.79)
     aim(camera, target)
-    camera_data.lens = 64
+    camera_data.lens = 58
     camera_data.clip_start = 0.05
     camera_data.clip_end = 300
     scene.camera = camera
