@@ -137,7 +137,7 @@ func inspect(img image.Image, ids, reflected []byte, r *report) error {
 	return nil
 }
 
-func render(wasm, output string, requireGPU bool) (err error) {
+func render(wasm, output string, requireGPU bool, evidence string) (err error) {
 	data, err := os.ReadFile(wasm)
 	if err != nil {
 		return err
@@ -176,7 +176,7 @@ func render(wasm, output string, requireGPU bool) (err error) {
 	}
 	if code := int32(result[0]); code != 0 {
 		line, _ := exported(in, "error_line")
-		return fmt.Errorf("guest render failed: code %d at guest/render.c:%d (require-gpu=%t; -100000 means an unmet guest requirement)", code, line, requireGPU)
+		return fmt.Errorf("guest render failed: code %d at guest/src/lib.rs:%d (require-gpu=%t; -100000 means an unmet guest requirement)", code, line, requireGPU)
 	}
 	frame, err := read(in, "frame", width*height*4)
 	if err != nil {
@@ -229,6 +229,23 @@ func render(wasm, output string, requireGPU bool) (err error) {
 	if err = inspect(decoded, ids, reflected, &r); err != nil {
 		return err
 	}
+	if evidence != "" {
+		linear, e := read(in, "linear_frame", width*height*16)
+		if e != nil {
+			return e
+		}
+		if e = os.MkdirAll(evidence, 0755); e != nil {
+			return e
+		}
+		for name, contents := range map[string][]byte{
+			"wago.linear.f32": linear, "wago.rgba": frame,
+			"wago.surfaces": ids, "wago.reflections": reflected,
+		} {
+			if e = os.WriteFile(filepath.Join(evidence, name), contents, 0644); e != nil {
+				return e
+			}
+		}
+	}
 	if err = os.MkdirAll(filepath.Dir(output), 0755); err != nil {
 		return err
 	}
@@ -251,8 +268,9 @@ func main() {
 	wasm := flag.String("guest", "guest/build/tracer.wasm", "Wasm guest path")
 	output := flag.String("out", "out/frame.png", "PNG output path")
 	gpu := flag.Bool("require-gpu", false, "require a discrete or integrated GPU; reject software Vulkan")
+	evidence := flag.String("evidence", "", "directory for raw guest linear pixels, Vulkan output, and ray labels")
 	flag.Parse()
-	if err := render(*wasm, *output, *gpu); err != nil {
+	if err := render(*wasm, *output, *gpu, *evidence); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

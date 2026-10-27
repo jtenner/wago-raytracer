@@ -1,2 +1,5 @@
 /guest/build/
 /host/build/
+/guest/target/
+/out/host-run/
+/guest/native/target/

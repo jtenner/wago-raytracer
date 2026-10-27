@@ -1,0 +1,37 @@
+    Updating crates.io index
+     Locking 1 package to highest compatible version
+      Adding libm v0.2.15 (available: v0.2.16)
+ Downloading crates ...
+  Downloaded libm v0.2.15
+   Compiling libm v0.2.15
+   Compiling wago-raytracer-guest v0.1.0 (/home/dev/.t3/worktrees/wago-raytracer/build-raytracer-milestone-1/guest)
+error: expected identifier, found keyword `type`
+   --> src/wire.rs:279:9
+    |
+278 | pub struct VkDescriptorPoolSize {
+    |            -------------------- while parsing this struct
+279 |     pub type: u32,
+    |         ^^^^ expected identifier, found keyword
+    |
+help: escape `type` to use it as an identifier
+    |
+279 |     pub r#type: u32,
+    |         ++
+
+error: no rules expected keyword `type`
+   --> src/wire.rs:283:67
+    |
+283 | const _: () = assert!(core::mem::offset_of!(VkDescriptorPoolSize, type) == 0);
+    |                                                                   ^^^^ no rules expected this token in macro call
+    |
+note: while trying to match meta-variable `$fields:expr`
+   --> /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library/core/src/mem/mod.rs:1661:37
+    = note: this macro expects a container type and a (nested) field path, like `offset_of!(Type, field)`
+
+error: expected expression, found keyword `type`
+   --> src/wire.rs:286:59
+    |
+286 | const _: () = assert!(offsetof(wv64_VkDescriptorPoolSize, type) == 0);
+    |                                                           ^^^^ expected expression
+
+error: could not compile `wago-raytracer-guest` (lib) due to 3 previous errors

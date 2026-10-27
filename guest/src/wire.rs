@@ -19,14 +19,6 @@ const _: () = assert!(core::mem::offset_of!(VkApplicationInfo, applicationVersio
 const _: () = assert!(core::mem::offset_of!(VkApplicationInfo, pEngineName) == 16);
 const _: () = assert!(core::mem::offset_of!(VkApplicationInfo, engineVersion) == 20);
 const _: () = assert!(core::mem::offset_of!(VkApplicationInfo, apiVersion) == 24);
-const _: () = assert!(sizeof(wv64_VkApplicationInfo) == 48);
-const _: () = assert!(offsetof(wv64_VkApplicationInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkApplicationInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkApplicationInfo, pApplicationName) == 16);
-const _: () = assert!(offsetof(wv64_VkApplicationInfo, applicationVersion) == 24);
-const _: () = assert!(offsetof(wv64_VkApplicationInfo, pEngineName) == 32);
-const _: () = assert!(offsetof(wv64_VkApplicationInfo, engineVersion) == 40);
-const _: () = assert!(offsetof(wv64_VkApplicationInfo, apiVersion) == 44);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkAttachmentDescription {
@@ -50,16 +42,6 @@ const _: () = assert!(core::mem::offset_of!(VkAttachmentDescription, stencilLoad
 const _: () = assert!(core::mem::offset_of!(VkAttachmentDescription, stencilStoreOp) == 24);
 const _: () = assert!(core::mem::offset_of!(VkAttachmentDescription, initialLayout) == 28);
 const _: () = assert!(core::mem::offset_of!(VkAttachmentDescription, finalLayout) == 32);
-const _: () = assert!(sizeof(wv64_VkAttachmentDescription) == 36);
-const _: () = assert!(offsetof(wv64_VkAttachmentDescription, flags) == 0);
-const _: () = assert!(offsetof(wv64_VkAttachmentDescription, format) == 4);
-const _: () = assert!(offsetof(wv64_VkAttachmentDescription, samples) == 8);
-const _: () = assert!(offsetof(wv64_VkAttachmentDescription, loadOp) == 12);
-const _: () = assert!(offsetof(wv64_VkAttachmentDescription, storeOp) == 16);
-const _: () = assert!(offsetof(wv64_VkAttachmentDescription, stencilLoadOp) == 20);
-const _: () = assert!(offsetof(wv64_VkAttachmentDescription, stencilStoreOp) == 24);
-const _: () = assert!(offsetof(wv64_VkAttachmentDescription, initialLayout) == 28);
-const _: () = assert!(offsetof(wv64_VkAttachmentDescription, finalLayout) == 32);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkAttachmentReference {
@@ -69,9 +51,6 @@ pub struct VkAttachmentReference {
 const _: () = assert!(core::mem::size_of::<VkAttachmentReference>() == 8);
 const _: () = assert!(core::mem::offset_of!(VkAttachmentReference, attachment) == 0);
 const _: () = assert!(core::mem::offset_of!(VkAttachmentReference, layout) == 4);
-const _: () = assert!(sizeof(wv64_VkAttachmentReference) == 8);
-const _: () = assert!(offsetof(wv64_VkAttachmentReference, attachment) == 0);
-const _: () = assert!(offsetof(wv64_VkAttachmentReference, layout) == 4);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkBufferCreateInfo {
@@ -93,15 +72,6 @@ const _: () = assert!(core::mem::offset_of!(VkBufferCreateInfo, usage) == 24);
 const _: () = assert!(core::mem::offset_of!(VkBufferCreateInfo, sharingMode) == 28);
 const _: () = assert!(core::mem::offset_of!(VkBufferCreateInfo, queueFamilyIndexCount) == 32);
 const _: () = assert!(core::mem::offset_of!(VkBufferCreateInfo, pQueueFamilyIndices) == 36);
-const _: () = assert!(sizeof(wv64_VkBufferCreateInfo) == 56);
-const _: () = assert!(offsetof(wv64_VkBufferCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkBufferCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkBufferCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkBufferCreateInfo, size) == 24);
-const _: () = assert!(offsetof(wv64_VkBufferCreateInfo, usage) == 32);
-const _: () = assert!(offsetof(wv64_VkBufferCreateInfo, sharingMode) == 36);
-const _: () = assert!(offsetof(wv64_VkBufferCreateInfo, queueFamilyIndexCount) == 40);
-const _: () = assert!(offsetof(wv64_VkBufferCreateInfo, pQueueFamilyIndices) == 48);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkBufferImageCopy {
@@ -119,13 +89,6 @@ const _: () = assert!(core::mem::offset_of!(VkBufferImageCopy, bufferImageHeight
 const _: () = assert!(core::mem::offset_of!(VkBufferImageCopy, imageSubresource) == 16);
 const _: () = assert!(core::mem::offset_of!(VkBufferImageCopy, imageOffset) == 32);
 const _: () = assert!(core::mem::offset_of!(VkBufferImageCopy, imageExtent) == 44);
-const _: () = assert!(sizeof(wv64_VkBufferImageCopy) == 56);
-const _: () = assert!(offsetof(wv64_VkBufferImageCopy, bufferOffset) == 0);
-const _: () = assert!(offsetof(wv64_VkBufferImageCopy, bufferRowLength) == 8);
-const _: () = assert!(offsetof(wv64_VkBufferImageCopy, bufferImageHeight) == 12);
-const _: () = assert!(offsetof(wv64_VkBufferImageCopy, imageSubresource) == 16);
-const _: () = assert!(offsetof(wv64_VkBufferImageCopy, imageOffset) == 32);
-const _: () = assert!(offsetof(wv64_VkBufferImageCopy, imageExtent) == 44);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkBufferMemoryBarrier {
@@ -149,16 +112,6 @@ const _: () = assert!(core::mem::offset_of!(VkBufferMemoryBarrier, dstQueueFamil
 const _: () = assert!(core::mem::offset_of!(VkBufferMemoryBarrier, buffer) == 24);
 const _: () = assert!(core::mem::offset_of!(VkBufferMemoryBarrier, offset) == 32);
 const _: () = assert!(core::mem::offset_of!(VkBufferMemoryBarrier, size) == 40);
-const _: () = assert!(sizeof(wv64_VkBufferMemoryBarrier) == 56);
-const _: () = assert!(offsetof(wv64_VkBufferMemoryBarrier, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkBufferMemoryBarrier, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkBufferMemoryBarrier, srcAccessMask) == 16);
-const _: () = assert!(offsetof(wv64_VkBufferMemoryBarrier, dstAccessMask) == 20);
-const _: () = assert!(offsetof(wv64_VkBufferMemoryBarrier, srcQueueFamilyIndex) == 24);
-const _: () = assert!(offsetof(wv64_VkBufferMemoryBarrier, dstQueueFamilyIndex) == 28);
-const _: () = assert!(offsetof(wv64_VkBufferMemoryBarrier, buffer) == 32);
-const _: () = assert!(offsetof(wv64_VkBufferMemoryBarrier, offset) == 40);
-const _: () = assert!(offsetof(wv64_VkBufferMemoryBarrier, size) == 48);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkCommandBufferAllocateInfo {
@@ -174,12 +127,6 @@ const _: () = assert!(core::mem::offset_of!(VkCommandBufferAllocateInfo, pNext) 
 const _: () = assert!(core::mem::offset_of!(VkCommandBufferAllocateInfo, commandPool) == 8);
 const _: () = assert!(core::mem::offset_of!(VkCommandBufferAllocateInfo, level) == 16);
 const _: () = assert!(core::mem::offset_of!(VkCommandBufferAllocateInfo, commandBufferCount) == 20);
-const _: () = assert!(sizeof(wv64_VkCommandBufferAllocateInfo) == 32);
-const _: () = assert!(offsetof(wv64_VkCommandBufferAllocateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkCommandBufferAllocateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkCommandBufferAllocateInfo, commandPool) == 16);
-const _: () = assert!(offsetof(wv64_VkCommandBufferAllocateInfo, level) == 24);
-const _: () = assert!(offsetof(wv64_VkCommandBufferAllocateInfo, commandBufferCount) == 28);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkCommandBufferBeginInfo {
@@ -193,11 +140,6 @@ const _: () = assert!(core::mem::offset_of!(VkCommandBufferBeginInfo, sType) == 
 const _: () = assert!(core::mem::offset_of!(VkCommandBufferBeginInfo, pNext) == 4);
 const _: () = assert!(core::mem::offset_of!(VkCommandBufferBeginInfo, flags) == 8);
 const _: () = assert!(core::mem::offset_of!(VkCommandBufferBeginInfo, pInheritanceInfo) == 12);
-const _: () = assert!(sizeof(wv64_VkCommandBufferBeginInfo) == 32);
-const _: () = assert!(offsetof(wv64_VkCommandBufferBeginInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkCommandBufferBeginInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkCommandBufferBeginInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkCommandBufferBeginInfo, pInheritanceInfo) == 24);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkCommandPoolCreateInfo {
@@ -211,11 +153,6 @@ const _: () = assert!(core::mem::offset_of!(VkCommandPoolCreateInfo, sType) == 0
 const _: () = assert!(core::mem::offset_of!(VkCommandPoolCreateInfo, pNext) == 4);
 const _: () = assert!(core::mem::offset_of!(VkCommandPoolCreateInfo, flags) == 8);
 const _: () = assert!(core::mem::offset_of!(VkCommandPoolCreateInfo, queueFamilyIndex) == 12);
-const _: () = assert!(sizeof(wv64_VkCommandPoolCreateInfo) == 24);
-const _: () = assert!(offsetof(wv64_VkCommandPoolCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkCommandPoolCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkCommandPoolCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkCommandPoolCreateInfo, queueFamilyIndex) == 20);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkComponentMapping {
@@ -229,11 +166,6 @@ const _: () = assert!(core::mem::offset_of!(VkComponentMapping, r) == 0);
 const _: () = assert!(core::mem::offset_of!(VkComponentMapping, g) == 4);
 const _: () = assert!(core::mem::offset_of!(VkComponentMapping, b) == 8);
 const _: () = assert!(core::mem::offset_of!(VkComponentMapping, a) == 12);
-const _: () = assert!(sizeof(wv64_VkComponentMapping) == 16);
-const _: () = assert!(offsetof(wv64_VkComponentMapping, r) == 0);
-const _: () = assert!(offsetof(wv64_VkComponentMapping, g) == 4);
-const _: () = assert!(offsetof(wv64_VkComponentMapping, b) == 8);
-const _: () = assert!(offsetof(wv64_VkComponentMapping, a) == 12);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkDescriptorBufferInfo {
@@ -245,10 +177,6 @@ const _: () = assert!(core::mem::size_of::<VkDescriptorBufferInfo>() == 24);
 const _: () = assert!(core::mem::offset_of!(VkDescriptorBufferInfo, buffer) == 0);
 const _: () = assert!(core::mem::offset_of!(VkDescriptorBufferInfo, offset) == 8);
 const _: () = assert!(core::mem::offset_of!(VkDescriptorBufferInfo, range) == 16);
-const _: () = assert!(sizeof(wv64_VkDescriptorBufferInfo) == 24);
-const _: () = assert!(offsetof(wv64_VkDescriptorBufferInfo, buffer) == 0);
-const _: () = assert!(offsetof(wv64_VkDescriptorBufferInfo, offset) == 8);
-const _: () = assert!(offsetof(wv64_VkDescriptorBufferInfo, range) == 16);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkDescriptorPoolCreateInfo {
@@ -266,25 +194,15 @@ const _: () = assert!(core::mem::offset_of!(VkDescriptorPoolCreateInfo, flags) =
 const _: () = assert!(core::mem::offset_of!(VkDescriptorPoolCreateInfo, maxSets) == 12);
 const _: () = assert!(core::mem::offset_of!(VkDescriptorPoolCreateInfo, poolSizeCount) == 16);
 const _: () = assert!(core::mem::offset_of!(VkDescriptorPoolCreateInfo, pPoolSizes) == 20);
-const _: () = assert!(sizeof(wv64_VkDescriptorPoolCreateInfo) == 40);
-const _: () = assert!(offsetof(wv64_VkDescriptorPoolCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkDescriptorPoolCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkDescriptorPoolCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkDescriptorPoolCreateInfo, maxSets) == 20);
-const _: () = assert!(offsetof(wv64_VkDescriptorPoolCreateInfo, poolSizeCount) == 24);
-const _: () = assert!(offsetof(wv64_VkDescriptorPoolCreateInfo, pPoolSizes) == 32);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkDescriptorPoolSize {
-    pub type: u32,
+    pub r#type: u32,
     pub descriptorCount: u32,
 }
 const _: () = assert!(core::mem::size_of::<VkDescriptorPoolSize>() == 8);
-const _: () = assert!(core::mem::offset_of!(VkDescriptorPoolSize, type) == 0);
+const _: () = assert!(core::mem::offset_of!(VkDescriptorPoolSize, r#type) == 0);
 const _: () = assert!(core::mem::offset_of!(VkDescriptorPoolSize, descriptorCount) == 4);
-const _: () = assert!(sizeof(wv64_VkDescriptorPoolSize) == 8);
-const _: () = assert!(offsetof(wv64_VkDescriptorPoolSize, type) == 0);
-const _: () = assert!(offsetof(wv64_VkDescriptorPoolSize, descriptorCount) == 4);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkDescriptorSetAllocateInfo {
@@ -300,12 +218,6 @@ const _: () = assert!(core::mem::offset_of!(VkDescriptorSetAllocateInfo, pNext) 
 const _: () = assert!(core::mem::offset_of!(VkDescriptorSetAllocateInfo, descriptorPool) == 8);
 const _: () = assert!(core::mem::offset_of!(VkDescriptorSetAllocateInfo, descriptorSetCount) == 16);
 const _: () = assert!(core::mem::offset_of!(VkDescriptorSetAllocateInfo, pSetLayouts) == 20);
-const _: () = assert!(sizeof(wv64_VkDescriptorSetAllocateInfo) == 40);
-const _: () = assert!(offsetof(wv64_VkDescriptorSetAllocateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkDescriptorSetAllocateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkDescriptorSetAllocateInfo, descriptorPool) == 16);
-const _: () = assert!(offsetof(wv64_VkDescriptorSetAllocateInfo, descriptorSetCount) == 24);
-const _: () = assert!(offsetof(wv64_VkDescriptorSetAllocateInfo, pSetLayouts) == 32);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkDescriptorSetLayoutBinding {
@@ -321,12 +233,6 @@ const _: () = assert!(core::mem::offset_of!(VkDescriptorSetLayoutBinding, descri
 const _: () = assert!(core::mem::offset_of!(VkDescriptorSetLayoutBinding, descriptorCount) == 8);
 const _: () = assert!(core::mem::offset_of!(VkDescriptorSetLayoutBinding, stageFlags) == 12);
 const _: () = assert!(core::mem::offset_of!(VkDescriptorSetLayoutBinding, pImmutableSamplers) == 16);
-const _: () = assert!(sizeof(wv64_VkDescriptorSetLayoutBinding) == 24);
-const _: () = assert!(offsetof(wv64_VkDescriptorSetLayoutBinding, binding) == 0);
-const _: () = assert!(offsetof(wv64_VkDescriptorSetLayoutBinding, descriptorType) == 4);
-const _: () = assert!(offsetof(wv64_VkDescriptorSetLayoutBinding, descriptorCount) == 8);
-const _: () = assert!(offsetof(wv64_VkDescriptorSetLayoutBinding, stageFlags) == 12);
-const _: () = assert!(offsetof(wv64_VkDescriptorSetLayoutBinding, pImmutableSamplers) == 16);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkDescriptorSetLayoutCreateInfo {
@@ -342,12 +248,6 @@ const _: () = assert!(core::mem::offset_of!(VkDescriptorSetLayoutCreateInfo, pNe
 const _: () = assert!(core::mem::offset_of!(VkDescriptorSetLayoutCreateInfo, flags) == 8);
 const _: () = assert!(core::mem::offset_of!(VkDescriptorSetLayoutCreateInfo, bindingCount) == 12);
 const _: () = assert!(core::mem::offset_of!(VkDescriptorSetLayoutCreateInfo, pBindings) == 16);
-const _: () = assert!(sizeof(wv64_VkDescriptorSetLayoutCreateInfo) == 32);
-const _: () = assert!(offsetof(wv64_VkDescriptorSetLayoutCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkDescriptorSetLayoutCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkDescriptorSetLayoutCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkDescriptorSetLayoutCreateInfo, bindingCount) == 20);
-const _: () = assert!(offsetof(wv64_VkDescriptorSetLayoutCreateInfo, pBindings) == 24);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkDeviceCreateInfo {
@@ -373,17 +273,6 @@ const _: () = assert!(core::mem::offset_of!(VkDeviceCreateInfo, ppEnabledLayerNa
 const _: () = assert!(core::mem::offset_of!(VkDeviceCreateInfo, enabledExtensionCount) == 28);
 const _: () = assert!(core::mem::offset_of!(VkDeviceCreateInfo, ppEnabledExtensionNames) == 32);
 const _: () = assert!(core::mem::offset_of!(VkDeviceCreateInfo, pEnabledFeatures) == 36);
-const _: () = assert!(sizeof(wv64_VkDeviceCreateInfo) == 72);
-const _: () = assert!(offsetof(wv64_VkDeviceCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkDeviceCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkDeviceCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkDeviceCreateInfo, queueCreateInfoCount) == 20);
-const _: () = assert!(offsetof(wv64_VkDeviceCreateInfo, pQueueCreateInfos) == 24);
-const _: () = assert!(offsetof(wv64_VkDeviceCreateInfo, enabledLayerCount) == 32);
-const _: () = assert!(offsetof(wv64_VkDeviceCreateInfo, ppEnabledLayerNames) == 40);
-const _: () = assert!(offsetof(wv64_VkDeviceCreateInfo, enabledExtensionCount) == 48);
-const _: () = assert!(offsetof(wv64_VkDeviceCreateInfo, ppEnabledExtensionNames) == 56);
-const _: () = assert!(offsetof(wv64_VkDeviceCreateInfo, pEnabledFeatures) == 64);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkDeviceQueueCreateInfo {
@@ -401,13 +290,6 @@ const _: () = assert!(core::mem::offset_of!(VkDeviceQueueCreateInfo, flags) == 8
 const _: () = assert!(core::mem::offset_of!(VkDeviceQueueCreateInfo, queueFamilyIndex) == 12);
 const _: () = assert!(core::mem::offset_of!(VkDeviceQueueCreateInfo, queueCount) == 16);
 const _: () = assert!(core::mem::offset_of!(VkDeviceQueueCreateInfo, pQueuePriorities) == 20);
-const _: () = assert!(sizeof(wv64_VkDeviceQueueCreateInfo) == 40);
-const _: () = assert!(offsetof(wv64_VkDeviceQueueCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkDeviceQueueCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkDeviceQueueCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkDeviceQueueCreateInfo, queueFamilyIndex) == 20);
-const _: () = assert!(offsetof(wv64_VkDeviceQueueCreateInfo, queueCount) == 24);
-const _: () = assert!(offsetof(wv64_VkDeviceQueueCreateInfo, pQueuePriorities) == 32);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkExtent2D {
@@ -417,9 +299,6 @@ pub struct VkExtent2D {
 const _: () = assert!(core::mem::size_of::<VkExtent2D>() == 8);
 const _: () = assert!(core::mem::offset_of!(VkExtent2D, width) == 0);
 const _: () = assert!(core::mem::offset_of!(VkExtent2D, height) == 4);
-const _: () = assert!(sizeof(wv64_VkExtent2D) == 8);
-const _: () = assert!(offsetof(wv64_VkExtent2D, width) == 0);
-const _: () = assert!(offsetof(wv64_VkExtent2D, height) == 4);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkExtent3D {
@@ -431,10 +310,6 @@ const _: () = assert!(core::mem::size_of::<VkExtent3D>() == 12);
 const _: () = assert!(core::mem::offset_of!(VkExtent3D, width) == 0);
 const _: () = assert!(core::mem::offset_of!(VkExtent3D, height) == 4);
 const _: () = assert!(core::mem::offset_of!(VkExtent3D, depth) == 8);
-const _: () = assert!(sizeof(wv64_VkExtent3D) == 12);
-const _: () = assert!(offsetof(wv64_VkExtent3D, width) == 0);
-const _: () = assert!(offsetof(wv64_VkExtent3D, height) == 4);
-const _: () = assert!(offsetof(wv64_VkExtent3D, depth) == 8);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkFramebufferCreateInfo {
@@ -458,16 +333,6 @@ const _: () = assert!(core::mem::offset_of!(VkFramebufferCreateInfo, pAttachment
 const _: () = assert!(core::mem::offset_of!(VkFramebufferCreateInfo, width) == 32);
 const _: () = assert!(core::mem::offset_of!(VkFramebufferCreateInfo, height) == 36);
 const _: () = assert!(core::mem::offset_of!(VkFramebufferCreateInfo, layers) == 40);
-const _: () = assert!(sizeof(wv64_VkFramebufferCreateInfo) == 64);
-const _: () = assert!(offsetof(wv64_VkFramebufferCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkFramebufferCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkFramebufferCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkFramebufferCreateInfo, renderPass) == 24);
-const _: () = assert!(offsetof(wv64_VkFramebufferCreateInfo, attachmentCount) == 32);
-const _: () = assert!(offsetof(wv64_VkFramebufferCreateInfo, pAttachments) == 40);
-const _: () = assert!(offsetof(wv64_VkFramebufferCreateInfo, width) == 48);
-const _: () = assert!(offsetof(wv64_VkFramebufferCreateInfo, height) == 52);
-const _: () = assert!(offsetof(wv64_VkFramebufferCreateInfo, layers) == 56);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkGraphicsPipelineCreateInfo {
@@ -511,26 +376,6 @@ const _: () = assert!(core::mem::offset_of!(VkGraphicsPipelineCreateInfo, render
 const _: () = assert!(core::mem::offset_of!(VkGraphicsPipelineCreateInfo, subpass) == 72);
 const _: () = assert!(core::mem::offset_of!(VkGraphicsPipelineCreateInfo, basePipelineHandle) == 80);
 const _: () = assert!(core::mem::offset_of!(VkGraphicsPipelineCreateInfo, basePipelineIndex) == 88);
-const _: () = assert!(sizeof(wv64_VkGraphicsPipelineCreateInfo) == 144);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, stageCount) == 20);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, pStages) == 24);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, pVertexInputState) == 32);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, pInputAssemblyState) == 40);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, pTessellationState) == 48);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, pViewportState) == 56);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, pRasterizationState) == 64);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, pMultisampleState) == 72);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, pDepthStencilState) == 80);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, pColorBlendState) == 88);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, pDynamicState) == 96);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, layout) == 104);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, renderPass) == 112);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, subpass) == 120);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, basePipelineHandle) == 128);
-const _: () = assert!(offsetof(wv64_VkGraphicsPipelineCreateInfo, basePipelineIndex) == 136);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkImageCreateInfo {
@@ -566,22 +411,6 @@ const _: () = assert!(core::mem::offset_of!(VkImageCreateInfo, sharingMode) == 5
 const _: () = assert!(core::mem::offset_of!(VkImageCreateInfo, queueFamilyIndexCount) == 56);
 const _: () = assert!(core::mem::offset_of!(VkImageCreateInfo, pQueueFamilyIndices) == 60);
 const _: () = assert!(core::mem::offset_of!(VkImageCreateInfo, initialLayout) == 64);
-const _: () = assert!(sizeof(wv64_VkImageCreateInfo) == 88);
-const _: () = assert!(offsetof(wv64_VkImageCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkImageCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkImageCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkImageCreateInfo, imageType) == 20);
-const _: () = assert!(offsetof(wv64_VkImageCreateInfo, format) == 24);
-const _: () = assert!(offsetof(wv64_VkImageCreateInfo, extent) == 28);
-const _: () = assert!(offsetof(wv64_VkImageCreateInfo, mipLevels) == 40);
-const _: () = assert!(offsetof(wv64_VkImageCreateInfo, arrayLayers) == 44);
-const _: () = assert!(offsetof(wv64_VkImageCreateInfo, samples) == 48);
-const _: () = assert!(offsetof(wv64_VkImageCreateInfo, tiling) == 52);
-const _: () = assert!(offsetof(wv64_VkImageCreateInfo, usage) == 56);
-const _: () = assert!(offsetof(wv64_VkImageCreateInfo, sharingMode) == 60);
-const _: () = assert!(offsetof(wv64_VkImageCreateInfo, queueFamilyIndexCount) == 64);
-const _: () = assert!(offsetof(wv64_VkImageCreateInfo, pQueueFamilyIndices) == 72);
-const _: () = assert!(offsetof(wv64_VkImageCreateInfo, initialLayout) == 80);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkImageSubresourceLayers {
@@ -595,11 +424,6 @@ const _: () = assert!(core::mem::offset_of!(VkImageSubresourceLayers, aspectMask
 const _: () = assert!(core::mem::offset_of!(VkImageSubresourceLayers, mipLevel) == 4);
 const _: () = assert!(core::mem::offset_of!(VkImageSubresourceLayers, baseArrayLayer) == 8);
 const _: () = assert!(core::mem::offset_of!(VkImageSubresourceLayers, layerCount) == 12);
-const _: () = assert!(sizeof(wv64_VkImageSubresourceLayers) == 16);
-const _: () = assert!(offsetof(wv64_VkImageSubresourceLayers, aspectMask) == 0);
-const _: () = assert!(offsetof(wv64_VkImageSubresourceLayers, mipLevel) == 4);
-const _: () = assert!(offsetof(wv64_VkImageSubresourceLayers, baseArrayLayer) == 8);
-const _: () = assert!(offsetof(wv64_VkImageSubresourceLayers, layerCount) == 12);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkImageSubresourceRange {
@@ -615,12 +439,6 @@ const _: () = assert!(core::mem::offset_of!(VkImageSubresourceRange, baseMipLeve
 const _: () = assert!(core::mem::offset_of!(VkImageSubresourceRange, levelCount) == 8);
 const _: () = assert!(core::mem::offset_of!(VkImageSubresourceRange, baseArrayLayer) == 12);
 const _: () = assert!(core::mem::offset_of!(VkImageSubresourceRange, layerCount) == 16);
-const _: () = assert!(sizeof(wv64_VkImageSubresourceRange) == 20);
-const _: () = assert!(offsetof(wv64_VkImageSubresourceRange, aspectMask) == 0);
-const _: () = assert!(offsetof(wv64_VkImageSubresourceRange, baseMipLevel) == 4);
-const _: () = assert!(offsetof(wv64_VkImageSubresourceRange, levelCount) == 8);
-const _: () = assert!(offsetof(wv64_VkImageSubresourceRange, baseArrayLayer) == 12);
-const _: () = assert!(offsetof(wv64_VkImageSubresourceRange, layerCount) == 16);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkImageViewCreateInfo {
@@ -642,15 +460,6 @@ const _: () = assert!(core::mem::offset_of!(VkImageViewCreateInfo, viewType) == 
 const _: () = assert!(core::mem::offset_of!(VkImageViewCreateInfo, format) == 28);
 const _: () = assert!(core::mem::offset_of!(VkImageViewCreateInfo, components) == 32);
 const _: () = assert!(core::mem::offset_of!(VkImageViewCreateInfo, subresourceRange) == 48);
-const _: () = assert!(sizeof(wv64_VkImageViewCreateInfo) == 80);
-const _: () = assert!(offsetof(wv64_VkImageViewCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkImageViewCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkImageViewCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkImageViewCreateInfo, image) == 24);
-const _: () = assert!(offsetof(wv64_VkImageViewCreateInfo, viewType) == 32);
-const _: () = assert!(offsetof(wv64_VkImageViewCreateInfo, format) == 36);
-const _: () = assert!(offsetof(wv64_VkImageViewCreateInfo, components) == 40);
-const _: () = assert!(offsetof(wv64_VkImageViewCreateInfo, subresourceRange) == 56);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkInstanceCreateInfo {
@@ -672,15 +481,6 @@ const _: () = assert!(core::mem::offset_of!(VkInstanceCreateInfo, enabledLayerCo
 const _: () = assert!(core::mem::offset_of!(VkInstanceCreateInfo, ppEnabledLayerNames) == 20);
 const _: () = assert!(core::mem::offset_of!(VkInstanceCreateInfo, enabledExtensionCount) == 24);
 const _: () = assert!(core::mem::offset_of!(VkInstanceCreateInfo, ppEnabledExtensionNames) == 28);
-const _: () = assert!(sizeof(wv64_VkInstanceCreateInfo) == 64);
-const _: () = assert!(offsetof(wv64_VkInstanceCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkInstanceCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkInstanceCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkInstanceCreateInfo, pApplicationInfo) == 24);
-const _: () = assert!(offsetof(wv64_VkInstanceCreateInfo, enabledLayerCount) == 32);
-const _: () = assert!(offsetof(wv64_VkInstanceCreateInfo, ppEnabledLayerNames) == 40);
-const _: () = assert!(offsetof(wv64_VkInstanceCreateInfo, enabledExtensionCount) == 48);
-const _: () = assert!(offsetof(wv64_VkInstanceCreateInfo, ppEnabledExtensionNames) == 56);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkMemoryAllocateInfo {
@@ -694,11 +494,6 @@ const _: () = assert!(core::mem::offset_of!(VkMemoryAllocateInfo, sType) == 0);
 const _: () = assert!(core::mem::offset_of!(VkMemoryAllocateInfo, pNext) == 4);
 const _: () = assert!(core::mem::offset_of!(VkMemoryAllocateInfo, allocationSize) == 8);
 const _: () = assert!(core::mem::offset_of!(VkMemoryAllocateInfo, memoryTypeIndex) == 16);
-const _: () = assert!(sizeof(wv64_VkMemoryAllocateInfo) == 32);
-const _: () = assert!(offsetof(wv64_VkMemoryAllocateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkMemoryAllocateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkMemoryAllocateInfo, allocationSize) == 16);
-const _: () = assert!(offsetof(wv64_VkMemoryAllocateInfo, memoryTypeIndex) == 24);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkMemoryHeap {
@@ -708,9 +503,6 @@ pub struct VkMemoryHeap {
 const _: () = assert!(core::mem::size_of::<VkMemoryHeap>() == 16);
 const _: () = assert!(core::mem::offset_of!(VkMemoryHeap, size) == 0);
 const _: () = assert!(core::mem::offset_of!(VkMemoryHeap, flags) == 8);
-const _: () = assert!(sizeof(wv64_VkMemoryHeap) == 16);
-const _: () = assert!(offsetof(wv64_VkMemoryHeap, size) == 0);
-const _: () = assert!(offsetof(wv64_VkMemoryHeap, flags) == 8);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkMemoryRequirements {
@@ -722,10 +514,6 @@ const _: () = assert!(core::mem::size_of::<VkMemoryRequirements>() == 24);
 const _: () = assert!(core::mem::offset_of!(VkMemoryRequirements, size) == 0);
 const _: () = assert!(core::mem::offset_of!(VkMemoryRequirements, alignment) == 8);
 const _: () = assert!(core::mem::offset_of!(VkMemoryRequirements, memoryTypeBits) == 16);
-const _: () = assert!(sizeof(wv64_VkMemoryRequirements) == 24);
-const _: () = assert!(offsetof(wv64_VkMemoryRequirements, size) == 0);
-const _: () = assert!(offsetof(wv64_VkMemoryRequirements, alignment) == 8);
-const _: () = assert!(offsetof(wv64_VkMemoryRequirements, memoryTypeBits) == 16);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkMemoryType {
@@ -735,9 +523,6 @@ pub struct VkMemoryType {
 const _: () = assert!(core::mem::size_of::<VkMemoryType>() == 8);
 const _: () = assert!(core::mem::offset_of!(VkMemoryType, propertyFlags) == 0);
 const _: () = assert!(core::mem::offset_of!(VkMemoryType, heapIndex) == 4);
-const _: () = assert!(sizeof(wv64_VkMemoryType) == 8);
-const _: () = assert!(offsetof(wv64_VkMemoryType, propertyFlags) == 0);
-const _: () = assert!(offsetof(wv64_VkMemoryType, heapIndex) == 4);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkOffset2D {
@@ -747,9 +532,6 @@ pub struct VkOffset2D {
 const _: () = assert!(core::mem::size_of::<VkOffset2D>() == 8);
 const _: () = assert!(core::mem::offset_of!(VkOffset2D, x) == 0);
 const _: () = assert!(core::mem::offset_of!(VkOffset2D, y) == 4);
-const _: () = assert!(sizeof(wv64_VkOffset2D) == 8);
-const _: () = assert!(offsetof(wv64_VkOffset2D, x) == 0);
-const _: () = assert!(offsetof(wv64_VkOffset2D, y) == 4);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkOffset3D {
@@ -761,10 +543,6 @@ const _: () = assert!(core::mem::size_of::<VkOffset3D>() == 12);
 const _: () = assert!(core::mem::offset_of!(VkOffset3D, x) == 0);
 const _: () = assert!(core::mem::offset_of!(VkOffset3D, y) == 4);
 const _: () = assert!(core::mem::offset_of!(VkOffset3D, z) == 8);
-const _: () = assert!(sizeof(wv64_VkOffset3D) == 12);
-const _: () = assert!(offsetof(wv64_VkOffset3D, x) == 0);
-const _: () = assert!(offsetof(wv64_VkOffset3D, y) == 4);
-const _: () = assert!(offsetof(wv64_VkOffset3D, z) == 8);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkPhysicalDeviceLimits {
@@ -982,113 +760,6 @@ const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceLimits, standardSamp
 const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceLimits, optimalBufferCopyOffsetAlignment) == 472);
 const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceLimits, optimalBufferCopyRowPitchAlignment) == 480);
 const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceLimits, nonCoherentAtomSize) == 488);
-const _: () = assert!(sizeof(wv64_VkPhysicalDeviceLimits) == 504);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxImageDimension1D) == 0);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxImageDimension2D) == 4);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxImageDimension3D) == 8);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxImageDimensionCube) == 12);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxImageArrayLayers) == 16);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxTexelBufferElements) == 20);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxUniformBufferRange) == 24);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxStorageBufferRange) == 28);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxPushConstantsSize) == 32);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxMemoryAllocationCount) == 36);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxSamplerAllocationCount) == 40);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, bufferImageGranularity) == 48);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, sparseAddressSpaceSize) == 56);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxBoundDescriptorSets) == 64);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxPerStageDescriptorSamplers) == 68);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxPerStageDescriptorUniformBuffers) == 72);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxPerStageDescriptorStorageBuffers) == 76);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxPerStageDescriptorSampledImages) == 80);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxPerStageDescriptorStorageImages) == 84);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxPerStageDescriptorInputAttachments) == 88);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxPerStageResources) == 92);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxDescriptorSetSamplers) == 96);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxDescriptorSetUniformBuffers) == 100);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxDescriptorSetUniformBuffersDynamic) == 104);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxDescriptorSetStorageBuffers) == 108);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxDescriptorSetStorageBuffersDynamic) == 112);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxDescriptorSetSampledImages) == 116);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxDescriptorSetStorageImages) == 120);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxDescriptorSetInputAttachments) == 124);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxVertexInputAttributes) == 128);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxVertexInputBindings) == 132);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxVertexInputAttributeOffset) == 136);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxVertexInputBindingStride) == 140);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxVertexOutputComponents) == 144);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxTessellationGenerationLevel) == 148);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxTessellationPatchSize) == 152);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxTessellationControlPerVertexInputComponents) == 156);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxTessellationControlPerVertexOutputComponents) == 160);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxTessellationControlPerPatchOutputComponents) == 164);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxTessellationControlTotalOutputComponents) == 168);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxTessellationEvaluationInputComponents) == 172);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxTessellationEvaluationOutputComponents) == 176);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxGeometryShaderInvocations) == 180);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxGeometryInputComponents) == 184);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxGeometryOutputComponents) == 188);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxGeometryOutputVertices) == 192);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxGeometryTotalOutputComponents) == 196);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxFragmentInputComponents) == 200);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxFragmentOutputAttachments) == 204);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxFragmentDualSrcAttachments) == 208);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxFragmentCombinedOutputResources) == 212);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxComputeSharedMemorySize) == 216);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxComputeWorkGroupCount) == 220);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxComputeWorkGroupInvocations) == 232);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxComputeWorkGroupSize) == 236);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, subPixelPrecisionBits) == 248);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, subTexelPrecisionBits) == 252);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, mipmapPrecisionBits) == 256);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxDrawIndexedIndexValue) == 260);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxDrawIndirectCount) == 264);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxSamplerLodBias) == 268);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxSamplerAnisotropy) == 272);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxViewports) == 276);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxViewportDimensions) == 280);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, viewportBoundsRange) == 288);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, viewportSubPixelBits) == 296);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, minMemoryMapAlignment) == 304);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, minTexelBufferOffsetAlignment) == 312);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, minUniformBufferOffsetAlignment) == 320);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, minStorageBufferOffsetAlignment) == 328);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, minTexelOffset) == 336);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxTexelOffset) == 340);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, minTexelGatherOffset) == 344);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxTexelGatherOffset) == 348);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, minInterpolationOffset) == 352);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxInterpolationOffset) == 356);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, subPixelInterpolationOffsetBits) == 360);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxFramebufferWidth) == 364);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxFramebufferHeight) == 368);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxFramebufferLayers) == 372);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, framebufferColorSampleCounts) == 376);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, framebufferDepthSampleCounts) == 380);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, framebufferStencilSampleCounts) == 384);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, framebufferNoAttachmentsSampleCounts) == 388);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxColorAttachments) == 392);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, sampledImageColorSampleCounts) == 396);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, sampledImageIntegerSampleCounts) == 400);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, sampledImageDepthSampleCounts) == 404);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, sampledImageStencilSampleCounts) == 408);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, storageImageSampleCounts) == 412);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxSampleMaskWords) == 416);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, timestampComputeAndGraphics) == 420);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, timestampPeriod) == 424);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxClipDistances) == 428);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxCullDistances) == 432);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, maxCombinedClipAndCullDistances) == 436);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, discreteQueuePriorities) == 440);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, pointSizeRange) == 444);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, lineWidthRange) == 452);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, pointSizeGranularity) == 460);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, lineWidthGranularity) == 464);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, strictLines) == 468);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, standardSampleLocations) == 472);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, optimalBufferCopyOffsetAlignment) == 480);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, optimalBufferCopyRowPitchAlignment) == 488);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceLimits, nonCoherentAtomSize) == 496);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkPhysicalDeviceMemoryProperties {
@@ -1102,11 +773,6 @@ const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceMemoryProperties, me
 const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceMemoryProperties, memoryTypes) == 4);
 const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceMemoryProperties, memoryHeapCount) == 260);
 const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceMemoryProperties, memoryHeaps) == 264);
-const _: () = assert!(sizeof(wv64_VkPhysicalDeviceMemoryProperties) == 520);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceMemoryProperties, memoryTypeCount) == 0);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceMemoryProperties, memoryTypes) == 4);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceMemoryProperties, memoryHeapCount) == 260);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceMemoryProperties, memoryHeaps) == 264);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkPhysicalDeviceProperties {
@@ -1130,16 +796,6 @@ const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceProperties, deviceNa
 const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceProperties, pipelineCacheUUID) == 276);
 const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceProperties, limits) == 296);
 const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceProperties, sparseProperties) == 792);
-const _: () = assert!(sizeof(wv64_VkPhysicalDeviceProperties) == 824);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceProperties, apiVersion) == 0);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceProperties, driverVersion) == 4);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceProperties, vendorID) == 8);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceProperties, deviceID) == 12);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceProperties, deviceType) == 16);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceProperties, deviceName) == 20);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceProperties, pipelineCacheUUID) == 276);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceProperties, limits) == 296);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceProperties, sparseProperties) == 800);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkPhysicalDeviceSparseProperties {
@@ -1155,12 +811,6 @@ const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceSparseProperties, re
 const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceSparseProperties, residencyStandard3DBlockShape) == 8);
 const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceSparseProperties, residencyAlignedMipSize) == 12);
 const _: () = assert!(core::mem::offset_of!(VkPhysicalDeviceSparseProperties, residencyNonResidentStrict) == 16);
-const _: () = assert!(sizeof(wv64_VkPhysicalDeviceSparseProperties) == 20);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceSparseProperties, residencyStandard2DBlockShape) == 0);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceSparseProperties, residencyStandard2DMultisampleBlockShape) == 4);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceSparseProperties, residencyStandard3DBlockShape) == 8);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceSparseProperties, residencyAlignedMipSize) == 12);
-const _: () = assert!(offsetof(wv64_VkPhysicalDeviceSparseProperties, residencyNonResidentStrict) == 16);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkPipelineColorBlendAttachmentState {
@@ -1182,15 +832,6 @@ const _: () = assert!(core::mem::offset_of!(VkPipelineColorBlendAttachmentState,
 const _: () = assert!(core::mem::offset_of!(VkPipelineColorBlendAttachmentState, dstAlphaBlendFactor) == 20);
 const _: () = assert!(core::mem::offset_of!(VkPipelineColorBlendAttachmentState, alphaBlendOp) == 24);
 const _: () = assert!(core::mem::offset_of!(VkPipelineColorBlendAttachmentState, colorWriteMask) == 28);
-const _: () = assert!(sizeof(wv64_VkPipelineColorBlendAttachmentState) == 32);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendAttachmentState, blendEnable) == 0);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendAttachmentState, srcColorBlendFactor) == 4);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendAttachmentState, dstColorBlendFactor) == 8);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendAttachmentState, colorBlendOp) == 12);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendAttachmentState, srcAlphaBlendFactor) == 16);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendAttachmentState, dstAlphaBlendFactor) == 20);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendAttachmentState, alphaBlendOp) == 24);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendAttachmentState, colorWriteMask) == 28);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkPipelineColorBlendStateCreateInfo {
@@ -1212,15 +853,6 @@ const _: () = assert!(core::mem::offset_of!(VkPipelineColorBlendStateCreateInfo,
 const _: () = assert!(core::mem::offset_of!(VkPipelineColorBlendStateCreateInfo, attachmentCount) == 20);
 const _: () = assert!(core::mem::offset_of!(VkPipelineColorBlendStateCreateInfo, pAttachments) == 24);
 const _: () = assert!(core::mem::offset_of!(VkPipelineColorBlendStateCreateInfo, blendConstants) == 28);
-const _: () = assert!(sizeof(wv64_VkPipelineColorBlendStateCreateInfo) == 56);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendStateCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendStateCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendStateCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendStateCreateInfo, logicOpEnable) == 20);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendStateCreateInfo, logicOp) == 24);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendStateCreateInfo, attachmentCount) == 28);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendStateCreateInfo, pAttachments) == 32);
-const _: () = assert!(offsetof(wv64_VkPipelineColorBlendStateCreateInfo, blendConstants) == 40);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkPipelineInputAssemblyStateCreateInfo {
@@ -1236,12 +868,6 @@ const _: () = assert!(core::mem::offset_of!(VkPipelineInputAssemblyStateCreateIn
 const _: () = assert!(core::mem::offset_of!(VkPipelineInputAssemblyStateCreateInfo, flags) == 8);
 const _: () = assert!(core::mem::offset_of!(VkPipelineInputAssemblyStateCreateInfo, topology) == 12);
 const _: () = assert!(core::mem::offset_of!(VkPipelineInputAssemblyStateCreateInfo, primitiveRestartEnable) == 16);
-const _: () = assert!(sizeof(wv64_VkPipelineInputAssemblyStateCreateInfo) == 32);
-const _: () = assert!(offsetof(wv64_VkPipelineInputAssemblyStateCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkPipelineInputAssemblyStateCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkPipelineInputAssemblyStateCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkPipelineInputAssemblyStateCreateInfo, topology) == 20);
-const _: () = assert!(offsetof(wv64_VkPipelineInputAssemblyStateCreateInfo, primitiveRestartEnable) == 24);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkPipelineLayoutCreateInfo {
@@ -1261,14 +887,6 @@ const _: () = assert!(core::mem::offset_of!(VkPipelineLayoutCreateInfo, setLayou
 const _: () = assert!(core::mem::offset_of!(VkPipelineLayoutCreateInfo, pSetLayouts) == 16);
 const _: () = assert!(core::mem::offset_of!(VkPipelineLayoutCreateInfo, pushConstantRangeCount) == 20);
 const _: () = assert!(core::mem::offset_of!(VkPipelineLayoutCreateInfo, pPushConstantRanges) == 24);
-const _: () = assert!(sizeof(wv64_VkPipelineLayoutCreateInfo) == 48);
-const _: () = assert!(offsetof(wv64_VkPipelineLayoutCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkPipelineLayoutCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkPipelineLayoutCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkPipelineLayoutCreateInfo, setLayoutCount) == 20);
-const _: () = assert!(offsetof(wv64_VkPipelineLayoutCreateInfo, pSetLayouts) == 24);
-const _: () = assert!(offsetof(wv64_VkPipelineLayoutCreateInfo, pushConstantRangeCount) == 32);
-const _: () = assert!(offsetof(wv64_VkPipelineLayoutCreateInfo, pPushConstantRanges) == 40);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkPipelineMultisampleStateCreateInfo {
@@ -1292,16 +910,6 @@ const _: () = assert!(core::mem::offset_of!(VkPipelineMultisampleStateCreateInfo
 const _: () = assert!(core::mem::offset_of!(VkPipelineMultisampleStateCreateInfo, pSampleMask) == 24);
 const _: () = assert!(core::mem::offset_of!(VkPipelineMultisampleStateCreateInfo, alphaToCoverageEnable) == 28);
 const _: () = assert!(core::mem::offset_of!(VkPipelineMultisampleStateCreateInfo, alphaToOneEnable) == 32);
-const _: () = assert!(sizeof(wv64_VkPipelineMultisampleStateCreateInfo) == 48);
-const _: () = assert!(offsetof(wv64_VkPipelineMultisampleStateCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkPipelineMultisampleStateCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkPipelineMultisampleStateCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkPipelineMultisampleStateCreateInfo, rasterizationSamples) == 20);
-const _: () = assert!(offsetof(wv64_VkPipelineMultisampleStateCreateInfo, sampleShadingEnable) == 24);
-const _: () = assert!(offsetof(wv64_VkPipelineMultisampleStateCreateInfo, minSampleShading) == 28);
-const _: () = assert!(offsetof(wv64_VkPipelineMultisampleStateCreateInfo, pSampleMask) == 32);
-const _: () = assert!(offsetof(wv64_VkPipelineMultisampleStateCreateInfo, alphaToCoverageEnable) == 40);
-const _: () = assert!(offsetof(wv64_VkPipelineMultisampleStateCreateInfo, alphaToOneEnable) == 44);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkPipelineRasterizationStateCreateInfo {
@@ -1333,20 +941,6 @@ const _: () = assert!(core::mem::offset_of!(VkPipelineRasterizationStateCreateIn
 const _: () = assert!(core::mem::offset_of!(VkPipelineRasterizationStateCreateInfo, depthBiasClamp) == 40);
 const _: () = assert!(core::mem::offset_of!(VkPipelineRasterizationStateCreateInfo, depthBiasSlopeFactor) == 44);
 const _: () = assert!(core::mem::offset_of!(VkPipelineRasterizationStateCreateInfo, lineWidth) == 48);
-const _: () = assert!(sizeof(wv64_VkPipelineRasterizationStateCreateInfo) == 64);
-const _: () = assert!(offsetof(wv64_VkPipelineRasterizationStateCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkPipelineRasterizationStateCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkPipelineRasterizationStateCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkPipelineRasterizationStateCreateInfo, depthClampEnable) == 20);
-const _: () = assert!(offsetof(wv64_VkPipelineRasterizationStateCreateInfo, rasterizerDiscardEnable) == 24);
-const _: () = assert!(offsetof(wv64_VkPipelineRasterizationStateCreateInfo, polygonMode) == 28);
-const _: () = assert!(offsetof(wv64_VkPipelineRasterizationStateCreateInfo, cullMode) == 32);
-const _: () = assert!(offsetof(wv64_VkPipelineRasterizationStateCreateInfo, frontFace) == 36);
-const _: () = assert!(offsetof(wv64_VkPipelineRasterizationStateCreateInfo, depthBiasEnable) == 40);
-const _: () = assert!(offsetof(wv64_VkPipelineRasterizationStateCreateInfo, depthBiasConstantFactor) == 44);
-const _: () = assert!(offsetof(wv64_VkPipelineRasterizationStateCreateInfo, depthBiasClamp) == 48);
-const _: () = assert!(offsetof(wv64_VkPipelineRasterizationStateCreateInfo, depthBiasSlopeFactor) == 52);
-const _: () = assert!(offsetof(wv64_VkPipelineRasterizationStateCreateInfo, lineWidth) == 56);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkPipelineShaderStageCreateInfo {
@@ -1366,14 +960,6 @@ const _: () = assert!(core::mem::offset_of!(VkPipelineShaderStageCreateInfo, sta
 const _: () = assert!(core::mem::offset_of!(VkPipelineShaderStageCreateInfo, module) == 16);
 const _: () = assert!(core::mem::offset_of!(VkPipelineShaderStageCreateInfo, pName) == 24);
 const _: () = assert!(core::mem::offset_of!(VkPipelineShaderStageCreateInfo, pSpecializationInfo) == 28);
-const _: () = assert!(sizeof(wv64_VkPipelineShaderStageCreateInfo) == 48);
-const _: () = assert!(offsetof(wv64_VkPipelineShaderStageCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkPipelineShaderStageCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkPipelineShaderStageCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkPipelineShaderStageCreateInfo, stage) == 20);
-const _: () = assert!(offsetof(wv64_VkPipelineShaderStageCreateInfo, module) == 24);
-const _: () = assert!(offsetof(wv64_VkPipelineShaderStageCreateInfo, pName) == 32);
-const _: () = assert!(offsetof(wv64_VkPipelineShaderStageCreateInfo, pSpecializationInfo) == 40);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkPipelineVertexInputStateCreateInfo {
@@ -1393,14 +979,6 @@ const _: () = assert!(core::mem::offset_of!(VkPipelineVertexInputStateCreateInfo
 const _: () = assert!(core::mem::offset_of!(VkPipelineVertexInputStateCreateInfo, pVertexBindingDescriptions) == 16);
 const _: () = assert!(core::mem::offset_of!(VkPipelineVertexInputStateCreateInfo, vertexAttributeDescriptionCount) == 20);
 const _: () = assert!(core::mem::offset_of!(VkPipelineVertexInputStateCreateInfo, pVertexAttributeDescriptions) == 24);
-const _: () = assert!(sizeof(wv64_VkPipelineVertexInputStateCreateInfo) == 48);
-const _: () = assert!(offsetof(wv64_VkPipelineVertexInputStateCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkPipelineVertexInputStateCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkPipelineVertexInputStateCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkPipelineVertexInputStateCreateInfo, vertexBindingDescriptionCount) == 20);
-const _: () = assert!(offsetof(wv64_VkPipelineVertexInputStateCreateInfo, pVertexBindingDescriptions) == 24);
-const _: () = assert!(offsetof(wv64_VkPipelineVertexInputStateCreateInfo, vertexAttributeDescriptionCount) == 32);
-const _: () = assert!(offsetof(wv64_VkPipelineVertexInputStateCreateInfo, pVertexAttributeDescriptions) == 40);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkPipelineViewportStateCreateInfo {
@@ -1420,14 +998,6 @@ const _: () = assert!(core::mem::offset_of!(VkPipelineViewportStateCreateInfo, v
 const _: () = assert!(core::mem::offset_of!(VkPipelineViewportStateCreateInfo, pViewports) == 16);
 const _: () = assert!(core::mem::offset_of!(VkPipelineViewportStateCreateInfo, scissorCount) == 20);
 const _: () = assert!(core::mem::offset_of!(VkPipelineViewportStateCreateInfo, pScissors) == 24);
-const _: () = assert!(sizeof(wv64_VkPipelineViewportStateCreateInfo) == 48);
-const _: () = assert!(offsetof(wv64_VkPipelineViewportStateCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkPipelineViewportStateCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkPipelineViewportStateCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkPipelineViewportStateCreateInfo, viewportCount) == 20);
-const _: () = assert!(offsetof(wv64_VkPipelineViewportStateCreateInfo, pViewports) == 24);
-const _: () = assert!(offsetof(wv64_VkPipelineViewportStateCreateInfo, scissorCount) == 32);
-const _: () = assert!(offsetof(wv64_VkPipelineViewportStateCreateInfo, pScissors) == 40);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkQueueFamilyProperties {
@@ -1441,11 +1011,6 @@ const _: () = assert!(core::mem::offset_of!(VkQueueFamilyProperties, queueFlags)
 const _: () = assert!(core::mem::offset_of!(VkQueueFamilyProperties, queueCount) == 4);
 const _: () = assert!(core::mem::offset_of!(VkQueueFamilyProperties, timestampValidBits) == 8);
 const _: () = assert!(core::mem::offset_of!(VkQueueFamilyProperties, minImageTransferGranularity) == 12);
-const _: () = assert!(sizeof(wv64_VkQueueFamilyProperties) == 24);
-const _: () = assert!(offsetof(wv64_VkQueueFamilyProperties, queueFlags) == 0);
-const _: () = assert!(offsetof(wv64_VkQueueFamilyProperties, queueCount) == 4);
-const _: () = assert!(offsetof(wv64_VkQueueFamilyProperties, timestampValidBits) == 8);
-const _: () = assert!(offsetof(wv64_VkQueueFamilyProperties, minImageTransferGranularity) == 12);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkRect2D {
@@ -1455,9 +1020,6 @@ pub struct VkRect2D {
 const _: () = assert!(core::mem::size_of::<VkRect2D>() == 16);
 const _: () = assert!(core::mem::offset_of!(VkRect2D, offset) == 0);
 const _: () = assert!(core::mem::offset_of!(VkRect2D, extent) == 8);
-const _: () = assert!(sizeof(wv64_VkRect2D) == 16);
-const _: () = assert!(offsetof(wv64_VkRect2D, offset) == 0);
-const _: () = assert!(offsetof(wv64_VkRect2D, extent) == 8);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkRenderPassBeginInfo {
@@ -1477,14 +1039,6 @@ const _: () = assert!(core::mem::offset_of!(VkRenderPassBeginInfo, framebuffer) 
 const _: () = assert!(core::mem::offset_of!(VkRenderPassBeginInfo, renderArea) == 24);
 const _: () = assert!(core::mem::offset_of!(VkRenderPassBeginInfo, clearValueCount) == 40);
 const _: () = assert!(core::mem::offset_of!(VkRenderPassBeginInfo, pClearValues) == 44);
-const _: () = assert!(sizeof(wv64_VkRenderPassBeginInfo) == 64);
-const _: () = assert!(offsetof(wv64_VkRenderPassBeginInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkRenderPassBeginInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkRenderPassBeginInfo, renderPass) == 16);
-const _: () = assert!(offsetof(wv64_VkRenderPassBeginInfo, framebuffer) == 24);
-const _: () = assert!(offsetof(wv64_VkRenderPassBeginInfo, renderArea) == 32);
-const _: () = assert!(offsetof(wv64_VkRenderPassBeginInfo, clearValueCount) == 48);
-const _: () = assert!(offsetof(wv64_VkRenderPassBeginInfo, pClearValues) == 56);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkRenderPassCreateInfo {
@@ -1508,16 +1062,6 @@ const _: () = assert!(core::mem::offset_of!(VkRenderPassCreateInfo, subpassCount
 const _: () = assert!(core::mem::offset_of!(VkRenderPassCreateInfo, pSubpasses) == 24);
 const _: () = assert!(core::mem::offset_of!(VkRenderPassCreateInfo, dependencyCount) == 28);
 const _: () = assert!(core::mem::offset_of!(VkRenderPassCreateInfo, pDependencies) == 32);
-const _: () = assert!(sizeof(wv64_VkRenderPassCreateInfo) == 64);
-const _: () = assert!(offsetof(wv64_VkRenderPassCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkRenderPassCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkRenderPassCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkRenderPassCreateInfo, attachmentCount) == 20);
-const _: () = assert!(offsetof(wv64_VkRenderPassCreateInfo, pAttachments) == 24);
-const _: () = assert!(offsetof(wv64_VkRenderPassCreateInfo, subpassCount) == 32);
-const _: () = assert!(offsetof(wv64_VkRenderPassCreateInfo, pSubpasses) == 40);
-const _: () = assert!(offsetof(wv64_VkRenderPassCreateInfo, dependencyCount) == 48);
-const _: () = assert!(offsetof(wv64_VkRenderPassCreateInfo, pDependencies) == 56);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkShaderModuleCreateInfo {
@@ -1533,12 +1077,6 @@ const _: () = assert!(core::mem::offset_of!(VkShaderModuleCreateInfo, pNext) == 
 const _: () = assert!(core::mem::offset_of!(VkShaderModuleCreateInfo, flags) == 8);
 const _: () = assert!(core::mem::offset_of!(VkShaderModuleCreateInfo, codeSize) == 12);
 const _: () = assert!(core::mem::offset_of!(VkShaderModuleCreateInfo, pCode) == 16);
-const _: () = assert!(sizeof(wv64_VkShaderModuleCreateInfo) == 40);
-const _: () = assert!(offsetof(wv64_VkShaderModuleCreateInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkShaderModuleCreateInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkShaderModuleCreateInfo, flags) == 16);
-const _: () = assert!(offsetof(wv64_VkShaderModuleCreateInfo, codeSize) == 24);
-const _: () = assert!(offsetof(wv64_VkShaderModuleCreateInfo, pCode) == 32);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkSubmitInfo {
@@ -1562,16 +1100,6 @@ const _: () = assert!(core::mem::offset_of!(VkSubmitInfo, commandBufferCount) ==
 const _: () = assert!(core::mem::offset_of!(VkSubmitInfo, pCommandBuffers) == 24);
 const _: () = assert!(core::mem::offset_of!(VkSubmitInfo, signalSemaphoreCount) == 28);
 const _: () = assert!(core::mem::offset_of!(VkSubmitInfo, pSignalSemaphores) == 32);
-const _: () = assert!(sizeof(wv64_VkSubmitInfo) == 72);
-const _: () = assert!(offsetof(wv64_VkSubmitInfo, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkSubmitInfo, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkSubmitInfo, waitSemaphoreCount) == 16);
-const _: () = assert!(offsetof(wv64_VkSubmitInfo, pWaitSemaphores) == 24);
-const _: () = assert!(offsetof(wv64_VkSubmitInfo, pWaitDstStageMask) == 32);
-const _: () = assert!(offsetof(wv64_VkSubmitInfo, commandBufferCount) == 40);
-const _: () = assert!(offsetof(wv64_VkSubmitInfo, pCommandBuffers) == 48);
-const _: () = assert!(offsetof(wv64_VkSubmitInfo, signalSemaphoreCount) == 56);
-const _: () = assert!(offsetof(wv64_VkSubmitInfo, pSignalSemaphores) == 64);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkSubpassDependency {
@@ -1591,14 +1119,6 @@ const _: () = assert!(core::mem::offset_of!(VkSubpassDependency, dstStageMask) =
 const _: () = assert!(core::mem::offset_of!(VkSubpassDependency, srcAccessMask) == 16);
 const _: () = assert!(core::mem::offset_of!(VkSubpassDependency, dstAccessMask) == 20);
 const _: () = assert!(core::mem::offset_of!(VkSubpassDependency, dependencyFlags) == 24);
-const _: () = assert!(sizeof(wv64_VkSubpassDependency) == 28);
-const _: () = assert!(offsetof(wv64_VkSubpassDependency, srcSubpass) == 0);
-const _: () = assert!(offsetof(wv64_VkSubpassDependency, dstSubpass) == 4);
-const _: () = assert!(offsetof(wv64_VkSubpassDependency, srcStageMask) == 8);
-const _: () = assert!(offsetof(wv64_VkSubpassDependency, dstStageMask) == 12);
-const _: () = assert!(offsetof(wv64_VkSubpassDependency, srcAccessMask) == 16);
-const _: () = assert!(offsetof(wv64_VkSubpassDependency, dstAccessMask) == 20);
-const _: () = assert!(offsetof(wv64_VkSubpassDependency, dependencyFlags) == 24);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkSubpassDescription {
@@ -1624,17 +1144,6 @@ const _: () = assert!(core::mem::offset_of!(VkSubpassDescription, pResolveAttach
 const _: () = assert!(core::mem::offset_of!(VkSubpassDescription, pDepthStencilAttachment) == 28);
 const _: () = assert!(core::mem::offset_of!(VkSubpassDescription, preserveAttachmentCount) == 32);
 const _: () = assert!(core::mem::offset_of!(VkSubpassDescription, pPreserveAttachments) == 36);
-const _: () = assert!(sizeof(wv64_VkSubpassDescription) == 72);
-const _: () = assert!(offsetof(wv64_VkSubpassDescription, flags) == 0);
-const _: () = assert!(offsetof(wv64_VkSubpassDescription, pipelineBindPoint) == 4);
-const _: () = assert!(offsetof(wv64_VkSubpassDescription, inputAttachmentCount) == 8);
-const _: () = assert!(offsetof(wv64_VkSubpassDescription, pInputAttachments) == 16);
-const _: () = assert!(offsetof(wv64_VkSubpassDescription, colorAttachmentCount) == 24);
-const _: () = assert!(offsetof(wv64_VkSubpassDescription, pColorAttachments) == 32);
-const _: () = assert!(offsetof(wv64_VkSubpassDescription, pResolveAttachments) == 40);
-const _: () = assert!(offsetof(wv64_VkSubpassDescription, pDepthStencilAttachment) == 48);
-const _: () = assert!(offsetof(wv64_VkSubpassDescription, preserveAttachmentCount) == 56);
-const _: () = assert!(offsetof(wv64_VkSubpassDescription, pPreserveAttachments) == 64);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkViewport {
@@ -1652,13 +1161,6 @@ const _: () = assert!(core::mem::offset_of!(VkViewport, width) == 8);
 const _: () = assert!(core::mem::offset_of!(VkViewport, height) == 12);
 const _: () = assert!(core::mem::offset_of!(VkViewport, minDepth) == 16);
 const _: () = assert!(core::mem::offset_of!(VkViewport, maxDepth) == 20);
-const _: () = assert!(sizeof(wv64_VkViewport) == 24);
-const _: () = assert!(offsetof(wv64_VkViewport, x) == 0);
-const _: () = assert!(offsetof(wv64_VkViewport, y) == 4);
-const _: () = assert!(offsetof(wv64_VkViewport, width) == 8);
-const _: () = assert!(offsetof(wv64_VkViewport, height) == 12);
-const _: () = assert!(offsetof(wv64_VkViewport, minDepth) == 16);
-const _: () = assert!(offsetof(wv64_VkViewport, maxDepth) == 20);
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VkWriteDescriptorSet {
@@ -1684,17 +1186,6 @@ const _: () = assert!(core::mem::offset_of!(VkWriteDescriptorSet, descriptorType
 const _: () = assert!(core::mem::offset_of!(VkWriteDescriptorSet, pImageInfo) == 32);
 const _: () = assert!(core::mem::offset_of!(VkWriteDescriptorSet, pBufferInfo) == 36);
 const _: () = assert!(core::mem::offset_of!(VkWriteDescriptorSet, pTexelBufferView) == 40);
-const _: () = assert!(sizeof(wv64_VkWriteDescriptorSet) == 64);
-const _: () = assert!(offsetof(wv64_VkWriteDescriptorSet, sType) == 0);
-const _: () = assert!(offsetof(wv64_VkWriteDescriptorSet, pNext) == 8);
-const _: () = assert!(offsetof(wv64_VkWriteDescriptorSet, dstSet) == 16);
-const _: () = assert!(offsetof(wv64_VkWriteDescriptorSet, dstBinding) == 24);
-const _: () = assert!(offsetof(wv64_VkWriteDescriptorSet, dstArrayElement) == 28);
-const _: () = assert!(offsetof(wv64_VkWriteDescriptorSet, descriptorCount) == 32);
-const _: () = assert!(offsetof(wv64_VkWriteDescriptorSet, descriptorType) == 36);
-const _: () = assert!(offsetof(wv64_VkWriteDescriptorSet, pImageInfo) == 40);
-const _: () = assert!(offsetof(wv64_VkWriteDescriptorSet, pBufferInfo) == 48);
-const _: () = assert!(offsetof(wv64_VkWriteDescriptorSet, pTexelBufferView) == 56);
 pub const VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT: u32 = 0x00000100;
 pub const VK_ACCESS_HOST_READ_BIT: u32 = 0x00002000;
 pub const VK_ACCESS_TRANSFER_READ_BIT: u32 = 0x00000800;
