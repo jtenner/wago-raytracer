@@ -189,3 +189,123 @@ reference's glowing nebula.
    reference shows.
 9. **Floor.** Slightly greyer than the reference's (239 vs 245), with a harder contact
    shadow.
+
+## Hands and poof pass
+
+This pass covers only the owner's two notes on the fur render:
+
+- **Hands:** they read as smooth mitts, and the orb looked pasted on.
+- **Fur:** it needed to be "poopier", meaning longer, fuller and shaggier, with a broken silhouette edge.
+
+Everything is in `assets/build_mascot.py` (`PAW`, `make_paw`, `FUR`, `add_fur`). The render settings are unchanged: Cycles CUDA on the RTX 4060, 512 samples, the same camera, 640×768. Run the build with
+
+    MUSE_SKIP_OBJ=1 /usr/bin/blender --background --python assets/build_mascot.py
+
+`MUSE_SKIP_OBJ=1` is new. It leaves `mascot.obj/.mtl` untouched, as agreed. Those files still hold the fur-pass hands and thumbs. `scene.json`, `mascot.blend` and `preview.png` are regenerated.
+
+### Hands
+
+The old hand was an ellipsoid with a separate ellipsoid thumb, and its inner edge stopped about 0.045H short of the orb. Each side is now one **metaball paw** converted to a mesh (`Hand Left/Right`). The `Thumb` objects are gone, so the scene has 28 mesh objects instead of 30.
+
+- **Palm.** An ellipsoid with radii (0.27, 0.25, 0.24) at (±0.60, −0.76, 1.70). It is rolled 20° so its inner edge rises toward the orb, as if carrying its weight.
+- **Fingers.** Three stubby capsule fingers, radius 0.07 and length 0.13.
+  - They are fanned around the orb's lower side at +6°, −24° and −54°.
+  - Their tips sit 0.315 m from an aim point 0.05 m behind the orb center, so the orb overlaps the fingertips slightly.
+  - Metaball stiffness is 5, not Blender's default 2, so neighboring fingers blend into creases instead of merging into a slab. That slab was what happened in the first, fur-less test.
+- **Thumb.** A capsule with radius 0.08, from (±0.70, −0.76, 1.86) to (±0.60, −0.84, 1.98). It leans about 40° in toward the orb, instead of standing up like the old thumbs-up ears.
+- **Contact squash.** After meshing, every paw vertex closer than 0.262 m to the orb center goes through a smooth max (blend 0.025) against that radius. The glass shell is r 0.255. This flattens the finger pads where they press on the orb and pushes a small bulge out around each pad.
+- **Paw fur.**
+  - The fur is shorter here (0.035 m), so the fingers survive the pile.
+  - There are no roots within 0.302 m of the orb center, so the pads stay bare and no strands poke into the glass.
+  - In the creases between fingers, root density drops to 5%. A crease is any point within 0.03 m of two finger capsules at nearly equal distance.
+- **Arms.** Unchanged. The new paws sit where the old hands met the arms.
+
+### Fur numbers landed on
+
+| | Fur pass | This pass |
+|---|---|---|
+| Rendered strands | 119,700 (1,995 parents × 60) | **299,500** (2,995 parents × 100): Body 191,100, each Arm 15,400, each Paw 12,500, each Leg 26,300 |
+| Length | 0.05 m everywhere | **body 0.085 m**, blending (smoothstep, z 2.0 → 2.3) to **head 0.042 m**; arms 0.05; paws 0.035; legs 0.07 |
+| Length variation | parent random 0.12 | parent random **0.3**; **50% of children at 0.6× length** (`child_length` 0.6, threshold 0.5) |
+| Root radius / tip | 0.0035 / ×0.12 | **0.0032 / ×0.1** |
+| Clump | 0.5, shape 0.3 | **0.75, shape 0.0, clump noise on (size 0.4)** |
+| Frizz (roughness) | uniform 0.0035, end 0.010, random 0.004 | **uniform 0.005, end 0.020, random 0.012** |
+| Direction | normal + down 0.72 | normal + down 0.72 + **comb back 0.3**. Without the comb, the clumped crown strands stood straight up like a crew cut |
+| Hair shader | melanin 0.08, redness 0.3, tint `#e2b39c` | **melanin 0.05, redness 0.25, tint `#e2c4bc`**. With 2.5× the strands, less undercoat shows and the pile went orange; this brings it back |
+| Render time | 18.9 s | **27.2 s** |
+| Peak GPU memory | – | **about 1.5 GB of 8 GB** (sampled with `nvidia-smi` during a 299,700-strand render) |
+
+I didn't need to back off at any point. 300k fits easily in memory and only adds about 8 s. I stopped in the middle of the owner's range rather than at 350k because the edge was already shaggier than the reference (see below). There is room to go higher if wanted.
+
+The face, eyes, smile, cheeks and orb have no fur, and the face stays clear. The head pile is shorter than in the fur pass (0.042 vs 0.05 m) because longer body fur is now combed back.
+
+### Compare-and-fix log
+
+I ran five full 512-sample cycles, plus two fur-less 64-sample geometry checks of the paws. Each cycle was measured with figure-normalized silhouette rows, region color means, a gridded paw crop against the reference, and zoomed edge and crown crops.
+
+1. **300k strands, first paws.**
+   - The paws read as cartoon gloves with long, thin fingers.
+   - The pile went orange: lower belly `#c19c88` vs `#c5ab9e`.
+   - Half-width at v 0.6 grew 0.006H, and the edge was a soft blur.
+   - Fix: fatter, shorter fingers on a bigger palm; clump 0.75 with clump noise; arm and leg fur shortened.
+2. **Stubby paws.**
+   - The fingers read on the shade-side paw only.
+   - Strict height share went to 0.803 from stray crown tips.
+   - The belly was still too saturated.
+   - Fix: head fur 0.042, arm fur 0.05, a paler and pinker tint, wider finger spacing, sparse crease fur.
+3. **Crown.** The crown was spiky and stood up; up-facing strands get no downward lean.
+   - The right paw's fingers were washed flat by the key light.
+   - Fix: comb back 0.3, finger radius 0.07 at +6/−24/−54°.
+4. **Combed.**
+   - The crown lies down, and strict height is back to 0.797.
+   - Fingers read on both paws.
+   - Belly color is within a few levels of the reference.
+   - The legs were still narrow.
+5. **Leg fur 0.07 m.** Leg width barely moved (+0.001H), because the leg fur hangs down rather than out. I kept it because the legs now match the body's shag.
+
+### Measured, before → after
+
+Values are normalized to figure height H. "Before" is the committed fur-pass `preview.png`, re-measured with this pass's scripts. Some sample spots differ from the fur-pass table above, so compare within this table.
+
+| Measure | Reference | Before | After |
+|---|---|---|---|
+| Figure height / frame, strict (any figure pixel) | 0.797 | 0.801 | **0.798** |
+| Figure height / frame, robust (rows ≥ 20 px wide) | 0.797 | 0.797 | **0.796** |
+| Background | `#f1eff2` | `#f0efef` | `#f0efef` |
+| Lower belly mean (u ±0.18, v 0.64–0.78) | `#c5ab9e` | `#c4a79b` | `#c2a698` |
+| Belly point (0, 0.66) | `#c2aaab` | `#c5a9a4` | `#bfa09c` |
+| Lit belly (+0.12, 0.66) | `#b79889` | `#c0a395` | `#bea08e` |
+| Shade belly (−0.15, 0.66) | `#ae927d` | `#bda096` | `#ba998a` |
+| Half-width L/R, v 0.05 | 0.170 / 0.156 | 0.158 / 0.154 | 0.169 / 0.149 |
+| v 0.10 | 0.212 / 0.211 | 0.203 / 0.198 | 0.205 / 0.195 |
+| v 0.20 | 0.247 / 0.237 | 0.242 / 0.236 | 0.241 / 0.237 |
+| v 0.30 | 0.256 / 0.256 | 0.250 / 0.250 | 0.252 / 0.252 |
+| v 0.40 | 0.277 / 0.275 | 0.275 / 0.278 | 0.286 / 0.280 |
+| v 0.50 (arms, paws) | 0.314 / 0.317 | 0.309 / 0.314 | 0.314 / 0.312 |
+| v 0.60 | 0.289 / 0.295 | 0.298 / 0.306 | 0.306 / 0.303 |
+| v 0.70 | 0.281 / 0.286 | 0.281 / 0.283 | 0.285 / 0.281 |
+| v 0.80 | 0.263 / 0.267 | 0.242 / 0.246 | 0.247 / 0.241 |
+| v 0.90 | 0.222 / 0.226 | 0.210 / 0.211 | 0.213 / 0.210 |
+| Eye centers (v) | 0.223 | 0.229 | 0.227 |
+| Orb | – | unchanged geometry | unchanged geometry |
+| Thumb tops (u, v) | (−0.17, 0.43) / (+0.19, 0.44) | (−0.18, 0.40) / (+0.17, 0.41) | (−0.18, 0.43) / (+0.18, 0.43) |
+| Paw inner edge \|u\| | 0.075–0.09, touching the orb | 0.11–0.12, 0.045H gap to the orb | 0.07, touching the orb and overlapped by it |
+| Paw bottom (v) | 0.595 | 0.59–0.60 | 0.60–0.605 |
+| Paw size (w × h) | 0.23 × 0.17 | 0.19 × 0.19 | 0.23 × 0.175 |
+| Fringe depth (80% → 15% contrast), L / R | 0.019 / 0.072 | 0.022 / 0.033 | **0.051 / 0.057** |
+
+Paw positions are read from a 0.05H grid and are good to about ±0.01H. The reference's right-side fringe value is inflated: its lit fur is close to the background's brightness.
+
+**Silhouette edge, in plain words.** The reference edge is a dense, long pile combed downward. It has a fine fuzz of tips and small separate tufts, but the outline stays fairly crisp. Before this pass, the render's edge was a uniform soft fleece blur, about half as deep. Now it is a deep, irregular fringe of clumped tufts with stray strands, about twice as deep as before (1.7–2.3×). It is broken along the sides of the body, arms and legs, and visibly shaggier than the reference. The crown lies down and its outline is soft and broken, close to the reference.
+
+### What still does not match the reference
+
+1. **The fur is now shaggier than the reference, not just fuller.** The reference pile is long but dense and neatly combed, with crisp tufts and darker gaps. Mine reads more like a shaggy muppet, with wispy strays at the shoulders and elbows; v 0.40 is 0.009H wide on the left. I went with the owner's note. If it is too much, the first knobs are clump 0.75 → 0.6 and roughness end 0.02 → 0.012.
+2. **The paws are more explicit than the reference's.** In the reference, the fingers are only suggested under the fur. Here three fingers and the creases read clearly, as the owner asked. As a result, the paws look slightly more like gloves than the reference's round bear paws. Paw bottoms sit 0.005–0.01H low.
+3. **Leg junction.** This is still the fur pass's residual 4. At v 0.8 the figure is 0.016–0.026H narrower, and the legs are 0.01–0.016H narrower at v 0.9. The longer belly fur now hangs over the step a little more visibly.
+4. **v 0.6 (elbows and arm bottoms)** is 0.008–0.017H wider than the reference, as it was before (the left side is 0.008 worse).
+5. **Shade side.** It is still lighter than the reference: `#ba998a` vs `#ae927d`.
+6. **Crown, right side.** At v 0.05 it is 0.007H narrow, because the tufts make the top outline lumpy.
+7. **Orb.** Not touched in this pass. Luminosity, filaments and the cyan chest spill are still the fur pass's residuals 2–3.
+8. **Hood depth, eye and smile height, floor.** Not touched; the fur pass's residuals 6, 7 and 9 still apply.
+9. **OBJ.** `mascot.obj/.mtl` was not regenerated, as agreed, and still has the fur-pass hands and thumbs.

@@ -5,9 +5,9 @@
   "up_axis": "+Z",
   "front_axis": "-Y",
   "color_space": "linear sRGB; hex colors are display sRGB",
-  "object_count": 30,
+  "object_count": 28,
   "light_count": 4,
-  "scene_object_count": 35,
+  "scene_object_count": 33,
   "camera": {
     "name": "Portrait camera",
     "type": "perspective",
@@ -401,15 +401,15 @@
           "name": "Long pile faux fur",
           "type": "principled_hair_chiang",
           "parametrization": "melanin",
-          "base_color_srgb_hex": "#e2b39c",
+          "base_color_srgb_hex": "#e2c4bc",
           "base_color": [
             0.7605245046752924,
-            0.45078578283822346,
-            0.33245153634617935
+            0.5520114015120001,
+            0.5028864580325687
           ],
-          "melanin": 0.08,
-          "melanin_redness": 0.3,
-          "tint": "#e2b39c",
+          "melanin": 0.05,
+          "melanin_redness": 0.25,
+          "tint": "#e2c4bc",
           "roughness": 0.32,
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
@@ -549,15 +549,15 @@
           "name": "Long pile faux fur",
           "type": "principled_hair_chiang",
           "parametrization": "melanin",
-          "base_color_srgb_hex": "#e2b39c",
+          "base_color_srgb_hex": "#e2c4bc",
           "base_color": [
             0.7605245046752924,
-            0.45078578283822346,
-            0.33245153634617935
+            0.5520114015120001,
+            0.5028864580325687
           ],
-          "melanin": 0.08,
-          "melanin_redness": 0.3,
-          "tint": "#e2b39c",
+          "melanin": 0.05,
+          "melanin_redness": 0.25,
+          "tint": "#e2c4bc",
           "roughness": 0.32,
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
@@ -787,15 +787,15 @@
           "name": "Long pile faux fur",
           "type": "principled_hair_chiang",
           "parametrization": "melanin",
-          "base_color_srgb_hex": "#e2b39c",
+          "base_color_srgb_hex": "#e2c4bc",
           "base_color": [
             0.7605245046752924,
-            0.45078578283822346,
-            0.33245153634617935
+            0.5520114015120001,
+            0.5028864580325687
           ],
-          "melanin": 0.08,
-          "melanin_redness": 0.3,
-          "tint": "#e2b39c",
+          "melanin": 0.05,
+          "melanin_redness": 0.25,
+          "tint": "#e2c4bc",
           "roughness": 0.32,
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
@@ -1692,15 +1692,15 @@
           "name": "Long pile faux fur",
           "type": "principled_hair_chiang",
           "parametrization": "melanin",
-          "base_color_srgb_hex": "#e2b39c",
+          "base_color_srgb_hex": "#e2c4bc",
           "base_color": [
             0.7605245046752924,
-            0.45078578283822346,
-            0.33245153634617935
+            0.5520114015120001,
+            0.5028864580325687
           ],
-          "melanin": 0.08,
-          "melanin_redness": 0.3,
-          "tint": "#e2b39c",
+          "melanin": 0.05,
+          "melanin_redness": 0.25,
+          "tint": "#e2c4bc",
           "roughness": 0.32,
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
@@ -1837,15 +1837,15 @@
           "name": "Long pile faux fur",
           "type": "principled_hair_chiang",
           "parametrization": "melanin",
-          "base_color_srgb_hex": "#e2b39c",
+          "base_color_srgb_hex": "#e2c4bc",
           "base_color": [
             0.7605245046752924,
-            0.45078578283822346,
-            0.33245153634617935
+            0.5520114015120001,
+            0.5028864580325687
           ],
-          "melanin": 0.08,
-          "melanin_redness": 0.3,
-          "tint": "#e2b39c",
+          "melanin": 0.05,
+          "melanin_redness": 0.25,
+          "tint": "#e2c4bc",
           "roughness": 0.32,
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
@@ -1999,9 +1999,9 @@
       "name": "Hand Left",
       "type": "MESH",
       "position": [
-        -0.6399999856948853,
-        -0.7599999904632568,
-        1.7400000095367432
+        0.0,
+        0.0,
+        0.0
       ],
       "rotation_euler_xyz": [
         0.0,
@@ -2018,19 +2018,19 @@
           1.0,
           0.0,
           0.0,
-          -0.6399999856948853
+          0.0
         ],
         [
           0.0,
           1.0,
           0.0,
-          -0.7599999904632568
+          0.0
         ],
         [
           0.0,
           0.0,
           1.0,
-          1.7400000095367432
+          0.0
         ],
         [
           0.0,
@@ -2040,15 +2040,55 @@
         ]
       ],
       "geometry": {
-        "primitive": "uv_sphere",
-        "radius": 1,
-        "segments": 64,
-        "rings": 40,
-        "baked_scale": [
-          0.3400000035762787,
-          0.30000001192092896,
-          0.25
-        ]
+        "primitive": "metaball_paw",
+        "palm": [
+          -0.6000000238418579,
+          -0.7599999904632568,
+          1.7000000476837158
+        ],
+        "palm_radii": [
+          0.27,
+          0.25,
+          0.24
+        ],
+        "palm_roll_degrees": -20,
+        "finger_tips": [
+          [
+            -0.31327441334724426,
+            -0.8799999952316284,
+            1.9279264211654663
+          ],
+          [
+            -0.28776681423187256,
+            -0.8799999952316284,
+            1.7668778896331787
+          ],
+          [
+            -0.1851523518562317,
+            -0.8799999952316284,
+            1.6401596069335938
+          ]
+        ],
+        "finger_radius": 0.07,
+        "finger_length": 0.13,
+        "thumb": [
+          [
+            -0.699999988079071,
+            -0.7599999904632568,
+            1.8600000143051147
+          ],
+          [
+            -0.6000000238418579,
+            -0.8399999737739563,
+            1.9800000190734863
+          ]
+        ],
+        "thumb_radius": 0.08,
+        "metaball_resolution": 0.01,
+        "orb_contact": {
+          "radius": 0.262,
+          "smooth_max_blend": 0.025
+        }
       },
       "materials": [
         {
@@ -2087,15 +2127,15 @@
           "name": "Long pile faux fur",
           "type": "principled_hair_chiang",
           "parametrization": "melanin",
-          "base_color_srgb_hex": "#e2b39c",
+          "base_color_srgb_hex": "#e2c4bc",
           "base_color": [
             0.7605245046752924,
-            0.45078578283822346,
-            0.33245153634617935
+            0.5520114015120001,
+            0.5028864580325687
           ],
-          "melanin": 0.08,
-          "melanin_redness": 0.3,
-          "tint": "#e2b39c",
+          "melanin": 0.05,
+          "melanin_redness": 0.25,
+          "tint": "#e2c4bc",
           "roughness": 0.32,
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
@@ -2135,21 +2175,21 @@
         },
         "sheen_tint_srgb_hex": "#e8d2b8"
       },
-      "vertices": 2498,
-      "polygons": 2560,
+      "vertices": 15746,
+      "polygons": 19477,
       "dimensions": [
-        0.6799998879432678,
-        0.5999998450279236,
-        0.5
+        0.7510933876037598,
+        0.4998229742050171,
+        0.6033203601837158
       ]
     },
     {
       "name": "Hand Right",
       "type": "MESH",
       "position": [
-        0.6399999856948853,
-        -0.7599999904632568,
-        1.7400000095367432
+        0.0,
+        0.0,
+        0.0
       ],
       "rotation_euler_xyz": [
         0.0,
@@ -2166,19 +2206,19 @@
           1.0,
           0.0,
           0.0,
-          0.6399999856948853
+          0.0
         ],
         [
           0.0,
           1.0,
           0.0,
-          -0.7599999904632568
+          0.0
         ],
         [
           0.0,
           0.0,
           1.0,
-          1.7400000095367432
+          0.0
         ],
         [
           0.0,
@@ -2188,15 +2228,55 @@
         ]
       ],
       "geometry": {
-        "primitive": "uv_sphere",
-        "radius": 1,
-        "segments": 64,
-        "rings": 40,
-        "baked_scale": [
-          0.3400000035762787,
-          0.30000001192092896,
-          0.25
-        ]
+        "primitive": "metaball_paw",
+        "palm": [
+          0.6000000238418579,
+          -0.7599999904632568,
+          1.7000000476837158
+        ],
+        "palm_radii": [
+          0.27,
+          0.25,
+          0.24
+        ],
+        "palm_roll_degrees": 20,
+        "finger_tips": [
+          [
+            0.31327441334724426,
+            -0.8799999952316284,
+            1.9279264211654663
+          ],
+          [
+            0.28776681423187256,
+            -0.8799999952316284,
+            1.7668778896331787
+          ],
+          [
+            0.1851523518562317,
+            -0.8799999952316284,
+            1.6401596069335938
+          ]
+        ],
+        "finger_radius": 0.07,
+        "finger_length": 0.13,
+        "thumb": [
+          [
+            0.699999988079071,
+            -0.7599999904632568,
+            1.8600000143051147
+          ],
+          [
+            0.6000000238418579,
+            -0.8399999737739563,
+            1.9800000190734863
+          ]
+        ],
+        "thumb_radius": 0.08,
+        "metaball_resolution": 0.01,
+        "orb_contact": {
+          "radius": 0.262,
+          "smooth_max_blend": 0.025
+        }
       },
       "materials": [
         {
@@ -2235,15 +2315,15 @@
           "name": "Long pile faux fur",
           "type": "principled_hair_chiang",
           "parametrization": "melanin",
-          "base_color_srgb_hex": "#e2b39c",
+          "base_color_srgb_hex": "#e2c4bc",
           "base_color": [
             0.7605245046752924,
-            0.45078578283822346,
-            0.33245153634617935
+            0.5520114015120001,
+            0.5028864580325687
           ],
-          "melanin": 0.08,
-          "melanin_redness": 0.3,
-          "tint": "#e2b39c",
+          "melanin": 0.05,
+          "melanin_redness": 0.25,
+          "tint": "#e2c4bc",
           "roughness": 0.32,
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
@@ -2283,12 +2363,12 @@
         },
         "sheen_tint_srgb_hex": "#e8d2b8"
       },
-      "vertices": 2498,
-      "polygons": 2560,
+      "vertices": 15746,
+      "polygons": 19477,
       "dimensions": [
-        0.6799998879432678,
-        0.5999998450279236,
-        0.5
+        0.7510933876037598,
+        0.4998229742050171,
+        0.603320837020874
       ]
     },
     {
@@ -9035,326 +9115,42 @@
         3.0,
         10.008000373840332
       ]
-    },
-    {
-      "name": "Thumb Left",
-      "type": "MESH",
-      "position": [
-        -0.6299999952316284,
-        -0.8199999928474426,
-        1.9700000286102295
-      ],
-      "rotation_euler_xyz": [
-        0.0,
-        0.15000000596046448,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "matrix_world": [
-        [
-          0.9887710809707642,
-          0.0,
-          0.14943814277648926,
-          -0.6299999952316284
-        ],
-        [
-          0.0,
-          1.0,
-          0.0,
-          -0.8199999928474426
-        ],
-        [
-          -0.14943814277648926,
-          0.0,
-          0.9887710809707642,
-          1.9700000286102295
-        ],
-        [
-          0.0,
-          0.0,
-          0.0,
-          1.0
-        ]
-      ],
-      "geometry": {
-        "primitive": "uv_sphere",
-        "radius": 1,
-        "segments": 64,
-        "rings": 40,
-        "baked_scale": [
-          0.15000000596046448,
-          0.1599999964237213,
-          0.1899999976158142
-        ]
-      },
-      "materials": [
-        {
-          "name": "Warm beige plush",
-          "base_color": [
-            0.3662525955988395,
-            0.24620132670783548,
-            0.18782077230067787
-          ],
-          "base_color_srgb_hex": "#a38878",
-          "roughness": 0.91,
-          "metallic": 0,
-          "transmission": 0,
-          "ior": 1.45,
-          "sheen": 1.0,
-          "emission": {
-            "color": [
-              0.3662525955988395,
-              0.24620132670783548,
-              0.18782077230067787
-            ],
-            "strength": 0
-          },
-          "surface_texture": {
-            "type": "noise_bump",
-            "coordinates": "object",
-            "scale": 125,
-            "detail": 2,
-            "roughness": 0.7,
-            "strength": 0.2,
-            "distance": 0.018
-          },
-          "sheen_tint_srgb_hex": "#e8d2b8"
-        },
-        {
-          "name": "Long pile faux fur",
-          "type": "principled_hair_chiang",
-          "parametrization": "melanin",
-          "base_color_srgb_hex": "#e2b39c",
-          "base_color": [
-            0.7605245046752924,
-            0.45078578283822346,
-            0.33245153634617935
-          ],
-          "melanin": 0.08,
-          "melanin_redness": 0.3,
-          "tint": "#e2b39c",
-          "roughness": 0.32,
-          "radial_roughness": 0.4,
-          "random_roughness": 0.3,
-          "coat": 0.0,
-          "ior": 1.55
-        }
-      ],
-      "material": {
-        "name": "Warm beige plush",
-        "base_color": [
-          0.3662525955988395,
-          0.24620132670783548,
-          0.18782077230067787
-        ],
-        "base_color_srgb_hex": "#a38878",
-        "roughness": 0.91,
-        "metallic": 0,
-        "transmission": 0,
-        "ior": 1.45,
-        "sheen": 1.0,
-        "emission": {
-          "color": [
-            0.3662525955988395,
-            0.24620132670783548,
-            0.18782077230067787
-          ],
-          "strength": 0
-        },
-        "surface_texture": {
-          "type": "noise_bump",
-          "coordinates": "object",
-          "scale": 125,
-          "detail": 2,
-          "roughness": 0.7,
-          "strength": 0.2,
-          "distance": 0.018
-        },
-        "sheen_tint_srgb_hex": "#e8d2b8"
-      },
-      "vertices": 2498,
-      "polygons": 2560,
-      "dimensions": [
-        0.2999999523162842,
-        0.3199998736381531,
-        0.3799999952316284
-      ]
-    },
-    {
-      "name": "Thumb Right",
-      "type": "MESH",
-      "position": [
-        0.6299999952316284,
-        -0.8199999928474426,
-        1.9700000286102295
-      ],
-      "rotation_euler_xyz": [
-        0.0,
-        -0.15000000596046448,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "matrix_world": [
-        [
-          0.9887710809707642,
-          0.0,
-          -0.14943814277648926,
-          0.6299999952316284
-        ],
-        [
-          0.0,
-          1.0,
-          0.0,
-          -0.8199999928474426
-        ],
-        [
-          0.14943814277648926,
-          0.0,
-          0.9887710809707642,
-          1.9700000286102295
-        ],
-        [
-          0.0,
-          0.0,
-          0.0,
-          1.0
-        ]
-      ],
-      "geometry": {
-        "primitive": "uv_sphere",
-        "radius": 1,
-        "segments": 64,
-        "rings": 40,
-        "baked_scale": [
-          0.15000000596046448,
-          0.1599999964237213,
-          0.1899999976158142
-        ]
-      },
-      "materials": [
-        {
-          "name": "Warm beige plush",
-          "base_color": [
-            0.3662525955988395,
-            0.24620132670783548,
-            0.18782077230067787
-          ],
-          "base_color_srgb_hex": "#a38878",
-          "roughness": 0.91,
-          "metallic": 0,
-          "transmission": 0,
-          "ior": 1.45,
-          "sheen": 1.0,
-          "emission": {
-            "color": [
-              0.3662525955988395,
-              0.24620132670783548,
-              0.18782077230067787
-            ],
-            "strength": 0
-          },
-          "surface_texture": {
-            "type": "noise_bump",
-            "coordinates": "object",
-            "scale": 125,
-            "detail": 2,
-            "roughness": 0.7,
-            "strength": 0.2,
-            "distance": 0.018
-          },
-          "sheen_tint_srgb_hex": "#e8d2b8"
-        },
-        {
-          "name": "Long pile faux fur",
-          "type": "principled_hair_chiang",
-          "parametrization": "melanin",
-          "base_color_srgb_hex": "#e2b39c",
-          "base_color": [
-            0.7605245046752924,
-            0.45078578283822346,
-            0.33245153634617935
-          ],
-          "melanin": 0.08,
-          "melanin_redness": 0.3,
-          "tint": "#e2b39c",
-          "roughness": 0.32,
-          "radial_roughness": 0.4,
-          "random_roughness": 0.3,
-          "coat": 0.0,
-          "ior": 1.55
-        }
-      ],
-      "material": {
-        "name": "Warm beige plush",
-        "base_color": [
-          0.3662525955988395,
-          0.24620132670783548,
-          0.18782077230067787
-        ],
-        "base_color_srgb_hex": "#a38878",
-        "roughness": 0.91,
-        "metallic": 0,
-        "transmission": 0,
-        "ior": 1.45,
-        "sheen": 1.0,
-        "emission": {
-          "color": [
-            0.3662525955988395,
-            0.24620132670783548,
-            0.18782077230067787
-          ],
-          "strength": 0
-        },
-        "surface_texture": {
-          "type": "noise_bump",
-          "coordinates": "object",
-          "scale": 125,
-          "detail": 2,
-          "roughness": 0.7,
-          "strength": 0.2,
-          "distance": 0.018
-        },
-        "sheen_tint_srgb_hex": "#e8d2b8"
-      },
-      "vertices": 2498,
-      "polygons": 2560,
-      "dimensions": [
-        0.2999999523162842,
-        0.3199998736381531,
-        0.3799999952316284
-      ]
     }
   ],
   "fur": {
     "type": "hair_particles_interpolated_children",
     "material": "Long pile faux fur",
     "settings": {
-      "length": 0.05,
-      "root_radius": 0.0035,
-      "tip_radius_factor": 0.12,
-      "children_total": 120000,
-      "children_per_parent": 60,
+      "length": 0.085,
+      "head_length": 0.042,
+      "head_blend_z": [
+        2.0,
+        2.3
+      ],
+      "arm_length": 0.05,
+      "paw_length": 0.035,
+      "leg_length": 0.07,
+      "root_radius": 0.0032,
+      "tip_radius_factor": 0.1,
+      "children_total": 300000,
+      "children_per_parent": 100,
       "down_bias": -0.72,
-      "random": 0.12,
-      "clump": 0.5,
-      "clump_shape": 0.3,
-      "roughness_uniform": 0.0035,
-      "roughness_end": 0.01,
-      "roughness_random": 0.004,
+      "comb_back": 0.3,
+      "random": 0.3,
+      "clump": 0.75,
+      "clump_shape": 0.0,
+      "clump_noise_size": 0.4,
+      "roughness_uniform": 0.005,
+      "roughness_end": 0.02,
+      "roughness_random": 0.012,
+      "child_length": 0.6,
+      "child_length_threshold": 0.5,
       "kink": "NO",
       "kink_amplitude": 0.0,
       "kink_frequency": 2.0,
-      "melanin": 0.08,
-      "melanin_redness": 0.3,
-      "tint": "#e2b39c",
+      "melanin": 0.05,
+      "melanin_redness": 0.25,
+      "tint": "#e2c4bc",
       "roughness": 0.32,
       "radial_roughness": 0.4,
       "random_roughness": 0.3,
@@ -9363,70 +9159,56 @@
     },
     "systems": {
       "Body": {
-        "parents": 1233,
-        "children_per_parent": 60,
-        "rendered_strands": 73980,
+        "parents": 1911,
+        "children_per_parent": 100,
+        "rendered_strands": 191100,
         "density_vertex_group": true,
         "surface_area_m2": 15.8193
       },
       "Arm Left": {
-        "parents": 99,
-        "children_per_parent": 60,
-        "rendered_strands": 5940,
+        "parents": 154,
+        "children_per_parent": 100,
+        "rendered_strands": 15400,
         "density_vertex_group": false,
         "surface_area_m2": 1.2808
       },
       "Hand Left": {
-        "parents": 85,
-        "children_per_parent": 60,
-        "rendered_strands": 5100,
-        "density_vertex_group": false,
-        "surface_area_m2": 1.101
-      },
-      "Thumb Left": {
-        "parents": 27,
-        "children_per_parent": 60,
-        "rendered_strands": 1620,
-        "density_vertex_group": false,
-        "surface_area_m2": 0.3477
+        "parents": 125,
+        "children_per_parent": 100,
+        "rendered_strands": 12500,
+        "density_vertex_group": true,
+        "surface_area_m2": 1.0396
       },
       "Foot Left": {
-        "parents": 170,
-        "children_per_parent": 60,
-        "rendered_strands": 10200,
+        "parents": 263,
+        "children_per_parent": 100,
+        "rendered_strands": 26300,
         "density_vertex_group": true,
         "surface_area_m2": 2.1807
       },
       "Arm Right": {
-        "parents": 99,
-        "children_per_parent": 60,
-        "rendered_strands": 5940,
+        "parents": 154,
+        "children_per_parent": 100,
+        "rendered_strands": 15400,
         "density_vertex_group": false,
         "surface_area_m2": 1.2808
       },
       "Hand Right": {
-        "parents": 85,
-        "children_per_parent": 60,
-        "rendered_strands": 5100,
-        "density_vertex_group": false,
-        "surface_area_m2": 1.101
-      },
-      "Thumb Right": {
-        "parents": 27,
-        "children_per_parent": 60,
-        "rendered_strands": 1620,
-        "density_vertex_group": false,
-        "surface_area_m2": 0.3477
+        "parents": 125,
+        "children_per_parent": 100,
+        "rendered_strands": 12500,
+        "density_vertex_group": true,
+        "surface_area_m2": 1.0396
       },
       "Foot Right": {
-        "parents": 170,
-        "children_per_parent": 60,
-        "rendered_strands": 10200,
+        "parents": 263,
+        "children_per_parent": 100,
+        "rendered_strands": 26300,
         "density_vertex_group": true,
         "surface_area_m2": 2.1807
       }
     },
-    "rendered_strands": 119700,
+    "rendered_strands": 299500,
     "excluded": [
       "Face",
       "Eyes",

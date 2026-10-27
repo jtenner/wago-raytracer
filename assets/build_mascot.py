@@ -9,21 +9,24 @@ The JSON records the primitive recipes and material settings for other renderers
 Fur is a hair particle system on each plush object. It lives in the .blend and is
 described in scene.json, but the OBJ cannot carry it. Furred objects have their
 primitive scale baked into the mesh (recipe "baked_scale") so strands are not stretched.
+Set MUSE_SKIP_OBJ=1 to leave mascot.obj/.mtl untouched.
 """
 
 import json
 import math
+import os
 import time
 from pathlib import Path
 
 import bpy
-from mathutils import Vector
+from mathutils import Quaternion, Vector
 
 
 OUT = Path(__file__).resolve().parent
 RECIPES = {}
 MATERIALS = {}
 FUR_SYSTEMS = {}
+PAW_FINGERS = {}
 
 # Body silhouette (radius, height) traced from reference/muse-mascot.jpg at
 # 3.57 m figure height, minus the fur pile: a broad flat crown, near-straight
@@ -42,14 +45,34 @@ BODY_DEPTH = 0.63  # front-to-back radius as a fraction of the side radius
 FACE = {"z": 2.75, "half_width": 0.645, "half_height": 0.505, "exponent": 2.6}
 
 FUR = {
-    "length": 0.05, "root_radius": 0.0035, "tip_radius_factor": 0.12,
-    "children_total": 120000, "children_per_parent": 60,
-    "down_bias": -0.72, "random": 0.12, "clump": 0.5, "clump_shape": 0.3,
-    "roughness_uniform": 0.0035, "roughness_end": 0.010, "roughness_random": 0.004,
+    # "length" is the longest strand (lower body); regions scale it down so the
+    # head stays short around the face and the paws keep their fingers.
+    "length": 0.085, "head_length": 0.042, "head_blend_z": (2.0, 2.3),
+    "arm_length": 0.05, "paw_length": 0.035, "leg_length": 0.07,
+    "root_radius": 0.0032, "tip_radius_factor": 0.1,
+    "children_total": 300000, "children_per_parent": 100,
+    "down_bias": -0.72, "comb_back": 0.3, "random": 0.3, "clump": 0.75, "clump_shape": 0.0,
+    "clump_noise_size": 0.4,
+    "roughness_uniform": 0.005, "roughness_end": 0.02, "roughness_random": 0.012,
+    "child_length": 0.6, "child_length_threshold": 0.5,
     "kink": "NO", "kink_amplitude": 0.0, "kink_frequency": 2.0,
-    "melanin": 0.08, "melanin_redness": 0.3, "tint": "#e2b39c",
+    "melanin": 0.05, "melanin_redness": 0.25, "tint": "#e2c4bc",
     "roughness": 0.32, "radial_roughness": 0.4, "random_roughness": 0.3,
     "coat": 0.0, "ior": 1.55,
+}
+
+# Paws, right side (mirrored for the left), in world coordinates. Each paw is
+# one metaball mesh: a palm tilted with its inner edge up, three stubby fingers
+# fanned around the orb's lower side, and a thumb leaning in from the top. The
+# fingers aim at a point just behind the orb center; the paw is then squashed
+# against the orb so the contact patches flatten and bulge slightly.
+PAW = {
+    "palm": (0.60, -0.76, 1.70), "palm_radii": (0.27, 0.25, 0.24), "palm_roll": 20,
+    "finger_target": (0, -0.88, 1.895), "finger_angles": (6, -24, -54),
+    "finger_radius": 0.07, "finger_reach": 0.315, "finger_length": 0.13,
+    "thumb_base": (0.70, -0.76, 1.86), "thumb_tip": (0.60, -0.84, 1.98), "thumb_radius": 0.08,
+    "stiffness": 5.0, "threshold": 0.6, "resolution": 0.01,
+    "contact_radius": 0.262, "contact_blend": 0.025,
 }
 
 # Feature placement, matched to the reference in compare-and-fix passes.
@@ -58,9 +81,6 @@ RIG = {
     "smile_half_width": 0.092, "smile_z": 2.58, "smile_sag": 0.045,
     "cheek_x": 0.35, "cheek_z": 2.56, "cheek_scale": (0.25, 0.03, 0.17),
     "arm_x": 0.86, "arm_scale": (0.22, 0.26, 0.50),
-    "hand_x": 0.64, "hand_y": -0.76, "hand_z": 1.74, "hand_scale": (0.34, 0.30, 0.25),
-    "thumb_x": 0.63, "thumb_y": -0.82, "thumb_z": 1.97, "thumb_scale": (0.15, 0.16, 0.19),
-    "thumb_tilt": 0.15,
     "leg_x": 0.455, "leg_radius": 0.315,
     "orb_center": (0, -0.93, 1.895), "orb_spill": 22,
 }
@@ -343,6 +363,88 @@ def make_leg(name, position, mat, radius=0.29, fillet=0.11, top=0.95):
     })
 
 
+def metaball_radius(surface_radius):
+    # A Blender metaball's field is stiffness * (1 - d^2/R^2)^3, so a lone
+    # element's surface sits inside its nominal radius R.
+    ratio = (PAW["threshold"] / PAW["stiffness"]) ** (1 / 3)
+    return surface_radius / math.sqrt(1 - ratio)
+
+
+def make_paw(name, sign, mat, orb_center):
+    # One soft mesh per paw (palm, three stubby fingers and a thumb), so the
+    # fur flows across the knuckles and the creases between fingers stay open.
+    def mirrored(point):
+        return Vector((sign * point[0], point[1], point[2]))
+
+    ball = bpy.data.metaballs.new(name)
+    ball.resolution = ball.render_resolution = PAW["resolution"]
+    ball.threshold = PAW["threshold"]
+    obj = bpy.data.objects.new(name, ball)
+    bpy.context.collection.objects.link(obj)
+
+    def element(kind, position, radius, rotation=None, size=(1, 1, 1)):
+        item = ball.elements.new()
+        item.type = kind
+        item.co = position
+        item.radius = metaball_radius(radius)
+        item.stiffness = PAW["stiffness"]
+        if rotation is not None:
+            item.rotation = rotation
+        item.size_x, item.size_y, item.size_z = size
+        return item
+
+    def capsule(start, end, radius):
+        axis = end - start
+        # A capsule element runs along its local X; size_x is its half-length.
+        rotation = Vector((1, 0, 0)).rotation_difference(axis.normalized())
+        element("CAPSULE", (start + end) / 2, radius, rotation,
+                (axis.length / 2, 1, 1))
+
+    palm = mirrored(PAW["palm"])
+    radii = PAW["palm_radii"]
+    scale = max(radii)
+    # Roll the palm so its inner edge rises toward the orb, carrying its weight.
+    roll = Quaternion((0, 1, 0), math.radians(sign * PAW["palm_roll"]))
+    element("ELLIPSOID", palm, scale, roll, tuple(r / scale for r in radii))
+    target = Vector(PAW["finger_target"])
+    tips, PAW_FINGERS[name] = [], []
+    for angle in PAW["finger_angles"]:
+        a = math.radians(angle)
+        tip = target + PAW["finger_reach"] * Vector((sign * math.cos(a), 0, math.sin(a)))
+        base = tip + PAW["finger_length"] * (palm - tip).normalized()
+        capsule(base, tip, PAW["finger_radius"])
+        tips.append(list(tip))
+        PAW_FINGERS[name].append((base, tip))
+    capsule(mirrored(PAW["thumb_base"]), mirrored(PAW["thumb_tip"]), PAW["thumb_radius"])
+
+    bpy.ops.object.select_all(action="DESELECT")
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    bpy.ops.object.convert(target="MESH")
+    obj = bpy.context.object
+    obj.select_set(False)
+    obj.name = name
+    # Squash the paw against the orb: a smooth max of the distance to the orb
+    # center and the contact radius flattens the touching pads and pushes a
+    # slight bulge out around them.
+    radius, blend = PAW["contact_radius"], PAW["contact_blend"]
+    for vertex in obj.data.vertices:
+        offset = vertex.co - orb_center
+        d = offset.length
+        if d < radius + blend:
+            reach = radius if d < radius - blend else radius + (d - radius + blend) ** 2 / (4 * blend)
+            vertex.co = orb_center + offset.normalized() * reach
+    obj.data.update()
+    return finish(obj, name, mat, {
+        "primitive": "metaball_paw", "palm": list(palm), "palm_radii": list(radii),
+        "palm_roll_degrees": sign * PAW["palm_roll"], "finger_tips": tips,
+        "finger_radius": PAW["finger_radius"], "finger_length": PAW["finger_length"],
+        "thumb": [list(mirrored(PAW["thumb_base"])), list(mirrored(PAW["thumb_tip"]))],
+        "thumb_radius": PAW["thumb_radius"], "metaball_resolution": PAW["resolution"],
+        "orb_contact": {"radius": radius, "smooth_max_blend": blend},
+    })
+
+
 def bake_scale(obj):
     RECIPES[obj.name]["baked_scale"] = list(obj.scale)
     bpy.ops.object.select_all(action="DESELECT")
@@ -378,7 +480,7 @@ def fur_material():
     return mat
 
 
-def add_fur(obj, mat, parents, weight=None):
+def add_fur(obj, mat, parents, weight=None, length=None):
     obj.data.materials.append(mat)
     modifier = obj.modifiers.new("Fur", "PARTICLE_SYSTEM")
     system = modifier.particle_system
@@ -396,21 +498,24 @@ def add_fur(obj, mat, parents, weight=None):
     part.emit_from = "FACE"
     part.use_emit_random = True
     part.use_even_distribution = True
-    # Strands lie down and fall toward the floor, like brushed long pile. With
-    # advanced hair, strand length is 4 x |normal + align| emission velocity, so
-    # scale the velocities by the length; a length vertex group evens out the
-    # result between up-facing and down-facing surfaces.
-    shortest = 1 + FUR["down_bias"]
+    # Strands lie down and fall toward the floor, like brushed long pile, and
+    # are combed slightly back so crown tufts lie down instead of standing up.
+    # With advanced hair, strand length is 4 x |normal + align| emission
+    # velocity, so scale the velocities by the length; a length vertex group
+    # evens out the result between up-facing and down-facing surfaces.
+    comb = Vector((0, FUR["comb_back"], FUR["down_bias"]))
+    shortest = 1 - comb.length
     unit = FUR["length"] / (4 * shortest)
     part.normal_factor = unit
-    part.object_align_factor = (0, 0, FUR["down_bias"] * unit)
+    part.object_align_factor = comb * unit
     part.factor_random = FUR["random"] * unit
     lengths = obj.vertex_groups.new(name="Fur length")
     rotation = obj.matrix_world.to_3x3()
     for vertex in obj.data.vertices:
         normal = (rotation @ vertex.normal).normalized()
-        reach = (normal + Vector((0, 0, FUR["down_bias"]))).length
-        lengths.add([vertex.index], min(1.0, shortest / max(reach, 1e-3)), "REPLACE")
+        reach = (normal + comb).length
+        scale = length(obj.matrix_world @ vertex.co) if length else 1.0
+        lengths.add([vertex.index], scale * min(1.0, shortest / max(reach, 1e-3)), "REPLACE")
     system.vertex_group_length = lengths.name
     part.hair_step = 5
     part.display_step = 3
@@ -422,6 +527,12 @@ def add_fur(obj, mat, parents, weight=None):
     part.virtual_parents = 0
     part.clump_factor = FUR["clump"]
     part.clump_shape = FUR["clump_shape"]
+    # Clump noise breaks the tufts into irregular sizes, and a share of shorter
+    # children breaks up the silhouette edge.
+    part.use_clump_noise = True
+    part.clump_noise_size = FUR["clump_noise_size"]
+    part.child_length = FUR["child_length"]
+    part.child_length_threshold = FUR["child_length_threshold"]
     part.roughness_1 = FUR["roughness_uniform"]
     part.roughness_1_size = 1.0
     part.roughness_endpoint = FUR["roughness_end"]
@@ -752,14 +863,10 @@ def main():
         # Align the long axis from the hand to the shoulder.
         axis = Vector((-sign * 0.10, 0.39, 0.67))
         arm.rotation_euler = axis.to_track_quat("Z", "Y").to_euler()
-        hand = sphere("Hand " + side, (sign * RIG["hand_x"], RIG["hand_y"], RIG["hand_z"]),
-                      RIG["hand_scale"], plush)
-        thumb = sphere("Thumb " + side, (sign * RIG["thumb_x"], RIG["thumb_y"], RIG["thumb_z"]),
-                       RIG["thumb_scale"], plush)
-        thumb.rotation_euler = (0, -sign * RIG["thumb_tilt"], 0)
+        hand = make_paw("Hand " + side, sign, plush, Vector(RIG["orb_center"]))
         foot = make_leg("Foot " + side, (sign * RIG["leg_x"], -0.05, 0), plush,
                         RIG["leg_radius"])
-        furred += [arm, hand, thumb, foot]
+        furred += [arm, hand, foot]
 
     smile_points = []
     half = RIG["smile_half_width"]
@@ -814,10 +921,44 @@ def main():
     def foot_weight(co):
         return 0.0 if co.z < 0.02 else 1.0
 
+    def segment_distance(co, start, end):
+        axis = end - start
+        t = min(1.0, max(0.0, (co - start).dot(axis) / axis.length_squared))
+        return (co - (start + t * axis)).length
+
+    def paw_weight(fingers):
+        def weight(co):
+            # Bare pads where the paw touches the orb, so no strands poke into the
+            # glass, and sparse fur in the creases so the fingers stay separate.
+            if (co - orb_center).length < PAW["contact_radius"] + 0.04:
+                return 0.0
+            near = sorted(segment_distance(co, *finger) for finger in fingers)
+            if near[1] < PAW["finger_radius"] + 0.03 and near[1] - near[0] < 0.025:
+                return 0.05
+            return 1.0
+        return weight
+
+    def body_length(co):
+        # Long shag on the body, blending to shorter fur over the head.
+        low, high = FUR["head_blend_z"]
+        t = min(1.0, max(0.0, (co.z - low) / (high - low)))
+        t = t * t * (3 - 2 * t)
+        return (FUR["length"] + (FUR["head_length"] - FUR["length"]) * t) / FUR["length"]
+
+    def constant(value):
+        return lambda co: value / FUR["length"]
+
     for obj in furred:
         parents = int(total_parents * areas[obj.name] / sum(areas.values()))
-        weight = body_weight if obj is body else foot_weight if obj.name.startswith("Foot") else None
-        add_fur(obj, fur, parents, weight)
+        if obj is body:
+            weight, length = body_weight, body_length
+        elif obj.name.startswith("Foot"):
+            weight, length = foot_weight, constant(FUR["leg_length"])
+        elif obj.name.startswith("Hand"):
+            weight, length = paw_weight(PAW_FINGERS[obj.name]), constant(FUR["paw_length"])
+        else:
+            weight, length = None, constant(FUR["arm_length"])
+        add_fur(obj, fur, parents, weight, length)
         FUR_SYSTEMS[obj.name]["surface_area_m2"] = round(areas[obj.name], 4)
 
     bpy.ops.mesh.primitive_plane_add(size=200, location=(0, 0, -0.008))
@@ -928,10 +1069,11 @@ def main():
     for obj in scene.objects:
         if obj.type == "MESH":
             obj.select_set(True)
-    bpy.ops.wm.obj_export(filepath=str(OUT / "mascot.obj"),
-                          export_selected_objects=True, export_materials=True,
-                          forward_axis="NEGATIVE_Y", up_axis="Z",
-                          apply_modifiers=True, export_normals=True)
+    if os.environ.get("MUSE_SKIP_OBJ") != "1":
+        bpy.ops.wm.obj_export(filepath=str(OUT / "mascot.obj"),
+                              export_selected_objects=True, export_materials=True,
+                              forward_axis="NEGATIVE_Y", up_axis="Z",
+                              apply_modifiers=True, export_normals=True)
     document = write_scene(scene, camera, target)
     scene.render.filepath = str(OUT / "preview.png")
     # No automatic backup file is needed when the script is rerun.
