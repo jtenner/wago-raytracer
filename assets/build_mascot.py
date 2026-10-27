@@ -15,6 +15,7 @@ Set MUSE_SKIP_OBJ=1 to leave mascot.obj/.mtl untouched.
 import json
 import math
 import os
+import random
 import time
 from pathlib import Path
 
@@ -48,17 +49,32 @@ FUR = {
     # "length" is the longest strand (lower body); regions scale it down so the
     # head stays short around the face and the paws keep their fingers.
     "length": 0.085, "head_length": 0.042, "head_blend_z": (2.0, 2.3),
-    "arm_length": 0.05, "paw_length": 0.035, "leg_length": 0.07,
+    "arm_length": 0.05, "paw_length": 0.042, "leg_length": 0.07,
     "root_radius": 0.0032, "tip_radius_factor": 0.1,
     "children_total": 300000, "children_per_parent": 100,
-    "down_bias": -0.72, "comb_back": 0.3, "random": 0.3, "clump": 0.75, "clump_shape": 0.0,
-    "clump_noise_size": 0.4,
-    "roughness_uniform": 0.005, "roughness_end": 0.02, "roughness_random": 0.012,
-    "child_length": 0.6, "child_length_threshold": 0.5,
+    "down_bias": -0.72, "comb_back": 0.3, "random": 0.3, "clump": 0.5, "clump_shape": 0.0,
+    "clump_noise": False, "clump_noise_size": 0.4,
+    "roughness_uniform": 0.005, "roughness_end": 0.012, "roughness_random": 0.008,
+    "roughness_random_threshold": 0.6,
+    "child_length": 0.75, "child_length_threshold": 0.3,
+    # Groom: each parent strand leaves the skin at lift_root degrees and arcs
+    # down to lift_tip, along the surface tangent of the comb direction (down
+    # and slightly back; toward the orb on the paws), with a little azimuth
+    # jitter so the pile is combed but not machined. Up-facing strands lie
+    # flatter, and the crown comb leans back so the top has no whorl.
+    "groom_lift_root": 40, "groom_lift_tip": 12, "groom_jitter": 10,
+    "groom_up_flatten": 0.6, "crown_back_bias": 0.8,
+    # The hood pile stands up more, like plush seen end-on; paw fur stands up
+    # as short plush so the thumb and the hinted fingers keep their shape.
+    "head_lift": (60, 35), "paw_lift": (65, 40),
+    # Shorter fur on the arm tops (which stand proud of the shoulders) and at
+    # the sole hem; no arm or leg roots buried inside the body.
+    "arm_cap_z": (2.0, 2.2), "arm_cap_factor": 0.35,
+    "leg_hem_z": (0.03, 0.15), "leg_hem_factor": 0.6, "buried_margin": 0.005,
     "kink": "NO", "kink_amplitude": 0.0, "kink_frequency": 2.0,
     "melanin": 0.05, "melanin_redness": 0.25, "tint": "#e2c4bc",
     "roughness": 0.32, "radial_roughness": 0.4, "random_roughness": 0.3,
-    "coat": 0.0, "ior": 1.55,
+    "coat": 0.0, "ior": 1.55, "opaque_share": 0.6, "opaque_color": "#e4c9a8",
 }
 
 # Paws, right side (mirrored for the left), in world coordinates. Each paw is
@@ -68,11 +84,11 @@ FUR = {
 # against the orb so the contact patches flatten and bulge slightly.
 PAW = {
     "palm": (0.60, -0.76, 1.70), "palm_radii": (0.27, 0.25, 0.24), "palm_roll": 20,
-    "finger_target": (0, -0.88, 1.895), "finger_angles": (6, -24, -54),
-    "finger_radius": 0.07, "finger_reach": 0.315, "finger_length": 0.13,
+    "finger_target": (0, -0.88, 1.895), "finger_angles": (2, -20, -42),
+    "finger_radius": 0.08, "finger_reach": 0.315, "finger_length": 0.10,
     "thumb_base": (0.70, -0.76, 1.86), "thumb_tip": (0.60, -0.84, 1.98), "thumb_radius": 0.08,
-    "stiffness": 5.0, "threshold": 0.6, "resolution": 0.01,
-    "contact_radius": 0.262, "contact_blend": 0.025,
+    "stiffness": 3.5, "threshold": 0.6, "resolution": 0.01,
+    "contact_radius": 0.262, "contact_blend": 0.025, "crease_density": 0.7,
 }
 
 # Feature placement, matched to the reference in compare-and-fix passes.
@@ -469,13 +485,23 @@ def fur_material():
         "IOR": FUR["ior"], "Random Roughness": FUR["random_roughness"],
     }.items():
         hair.inputs[socket].default_value = value
-    links.new(hair.outputs[0], nodes.get("Material Output").inputs["Surface"])
+    # Faux-fur fibers are fairly opaque. Pure Chiang hair at this low melanin
+    # transmits so much that the thin outer layer of the pile reads as a pale
+    # haze; a share of opaque diffuse keeps the silhouette edge fur-colored.
+    diffuse = nodes.new("ShaderNodeBsdfDiffuse")
+    diffuse.inputs["Color"].default_value = (*rgb(FUR["opaque_color"]), 1)
+    mix = nodes.new("ShaderNodeMixShader")
+    mix.inputs["Fac"].default_value = FUR["opaque_share"]
+    links.new(hair.outputs[0], mix.inputs[1])
+    links.new(diffuse.outputs[0], mix.inputs[2])
+    links.new(mix.outputs[0], nodes.get("Material Output").inputs["Surface"])
     mat.diffuse_color = (*tint, 1)
     MATERIALS[mat.name] = {
         "name": mat.name, "type": "principled_hair_chiang", "parametrization": "melanin",
         "base_color_srgb_hex": FUR["tint"], "base_color": list(tint),
         **{k: FUR[k] for k in ("melanin", "melanin_redness", "tint", "roughness",
-                               "radial_roughness", "random_roughness", "coat", "ior")},
+                               "radial_roughness", "random_roughness", "coat", "ior",
+                               "opaque_share", "opaque_color")},
     }
     return mat
 
@@ -529,7 +555,7 @@ def add_fur(obj, mat, parents, weight=None, length=None):
     part.clump_shape = FUR["clump_shape"]
     # Clump noise breaks the tufts into irregular sizes, and a share of shorter
     # children breaks up the silhouette edge.
-    part.use_clump_noise = True
+    part.use_clump_noise = FUR["clump_noise"]
     part.clump_noise_size = FUR["clump_noise_size"]
     part.child_length = FUR["child_length"]
     part.child_length_threshold = FUR["child_length_threshold"]
@@ -539,7 +565,7 @@ def add_fur(obj, mat, parents, weight=None, length=None):
     part.roughness_end_shape = 1.0
     part.roughness_2 = FUR["roughness_random"]
     part.roughness_2_size = 1.0
-    part.roughness_2_threshold = 0.4
+    part.roughness_2_threshold = FUR["roughness_random_threshold"]
     part.kink = FUR["kink"]
     part.kink_amplitude = FUR["kink_amplitude"]
     part.kink_frequency = FUR["kink_frequency"]
@@ -556,6 +582,82 @@ def add_fur(obj, mat, parents, weight=None, length=None):
         "density_vertex_group": bool(weight),
     }
     return system
+
+
+def comb_fur(obj, toward=None, lift=None, head_lift=False):
+    # Velocity-emitted hair cannot lie along the body: a comb strong enough to
+    # lay the side fur down pushes the crown strands into the head. So the
+    # parent keys are set directly, keeping each strand's emitted length.
+    bpy.ops.object.select_all(action="DESELECT")
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    bpy.context.view_layer.update()
+    bpy.ops.object.mode_set(mode="PARTICLE_EDIT")
+    bpy.ops.object.mode_set(mode="OBJECT")
+    obj.select_set(False)
+    # A key write through the emitter's own modifier flags its hair as edited,
+    # so re-evaluation keeps the groomed keys instead of re-emitting them.
+    own = obj.evaluated_get(bpy.context.evaluated_depsgraph_get())
+    first = next(p for p in own.particle_systems[0].particles if len(p.hair_keys))
+    index = list(own.particle_systems[0].particles).index(first)
+    key = obj.particle_systems[0].particles[index].hair_keys[0]
+    key.co_object_set(own, own.modifiers["Fur"], first, first.hair_keys[0].co_object(own, own.modifiers["Fur"], first))
+    # Writes also invalidate the emitter's evaluated copy, which the
+    # hair-to-object transform reads. An untouched twin (same mesh, seed and
+    # roots) supplies that transform instead.
+    twin = obj.copy()
+    bpy.context.collection.objects.link(twin)
+    evaluated = twin.evaluated_get(bpy.context.evaluated_depsgraph_get())
+    modifier = evaluated.modifiers["Fur"]
+    particles = evaluated.particle_systems[0].particles
+    strands = [[key.co_object(evaluated, modifier, p) for key in p.hair_keys] for p in particles]
+    to_local = obj.matrix_world.inverted().to_3x3()
+    down = to_local @ Vector((0, FUR["comb_back"], -1))
+    rng = random.Random(obj.particle_systems[0].seed)
+    lift_root, lift_tip = (math.radians(a) for a in (lift or (FUR["groom_lift_root"], FUR["groom_lift_tip"])))
+    combed = []
+    for index, keys in enumerate(strands):
+        if len(keys) < 2:
+            continue  # roots removed by the density group carry no keys
+        length = sum((b - a).length for a, b in zip(keys, keys[1:]))
+        root = keys[0]
+        # Query the twin: a query on the emitter re-evaluates it mid-groom.
+        normal = twin.closest_point_on_mesh(root)[2].normalized()
+        comb = down if toward is None else to_local @ (toward - obj.matrix_world @ root)
+        tangent = comb - comb.dot(normal) * normal
+        # Where the comb runs into the surface (crown, arm tops), blend in an
+        # outward comb; blending rather than switching avoids parting lines.
+        # A backward bias keeps the very top flowing one way instead of
+        # radiating from a whorl that parts the pile.
+        outward_dir = Vector((normal.x, normal.y + FUR["crown_back_bias"], 0))
+        outward_dir -= outward_dir.dot(normal) * normal
+        tangent += max(0.0, 1 - tangent.length / comb.length) * comb.length * outward_dir.normalized()
+        tangent = Quaternion(normal, math.radians(rng.uniform(-1, 1) * FUR["groom_jitter"])) @ tangent.normalized()
+        # Up-facing strands (crown, arm tops) lie flatter, so they do not
+        # stand up as a crest on the outline.
+        flatten = 1 - FUR["groom_up_flatten"] * max(0.0, (obj.matrix_world.to_3x3() @ normal).normalized().z)
+        steps = len(keys) - 1
+        points = [root.copy()]
+        # The hood pile stands up more, like plush seen end-on, as in the reference.
+        if head_lift:
+            low, high = FUR["head_blend_z"]
+            h = min(1.0, max(0.0, ((obj.matrix_world @ root).z - low) / (high - low)))
+            h = h * h * (3 - 2 * h)
+        else:
+            h = 0.0
+        root_angle = lift_root + h * (math.radians(FUR["head_lift"][0]) - lift_root)
+        tip_angle = lift_tip + h * (math.radians(FUR["head_lift"][1]) - lift_tip)
+        for k in range(1, steps + 1):
+            angle = flatten * (root_angle + (tip_angle - root_angle) * (k - 0.5) / steps)
+            points.append(points[-1] + (length / steps) * (math.cos(angle) * tangent + math.sin(angle) * normal))
+        combed.append((index, points))
+    originals = obj.particle_systems[0].particles
+    for index, points in combed:
+        particle = particles[index]
+        for key, point in zip(originals[index].hair_keys, points):
+            key.co_object_set(evaluated, modifier, particle, point)
+    bpy.data.objects.remove(twin)
+    obj.update_tag()
 
 
 def surface_area(obj):
@@ -934,7 +1036,7 @@ def main():
                 return 0.0
             near = sorted(segment_distance(co, *finger) for finger in fingers)
             if near[1] < PAW["finger_radius"] + 0.03 and near[1] - near[0] < 0.025:
-                return 0.05
+                return PAW["crease_density"]
             return 1.0
         return weight
 
@@ -945,6 +1047,34 @@ def main():
         t = t * t * (3 - 2 * t)
         return (FUR["length"] + (FUR["head_length"] - FUR["length"]) * t) / FUR["length"]
 
+    def unburied(weight):
+        # Arm and leg roots inside the body grow out through it as stray tufts
+        # at the shoulders and the belly-leg junction.
+        to_body = body.matrix_world.inverted()
+        def combined(co):
+            local = to_body @ co
+            hit, location, normal, _ = body.closest_point_on_mesh(local)
+            if hit and (local - location).dot(normal) < -FUR["buried_margin"]:
+                return 0.0
+            return weight(co) if weight else 1.0
+        return combined
+
+    def arm_length(co):
+        # The arm's top cap stands proud of the shoulder; short fur there keeps
+        # its tips from fanning out past the silhouette.
+        low, high = FUR["arm_cap_z"]
+        t = min(1.0, max(0.0, (co.z - low) / (high - low)))
+        t = t * t * (3 - 2 * t)
+        return FUR["arm_length"] * (1 - (1 - FUR["arm_cap_factor"]) * t) / FUR["length"]
+
+    def leg_length(co):
+        # Short fur at the sole hem, so the combed-down leg pile does not hang
+        # past the soles onto the floor.
+        low, high = FUR["leg_hem_z"]
+        t = min(1.0, max(0.0, (co.z - low) / (high - low)))
+        t = t * t * (3 - 2 * t)
+        return FUR["leg_length"] * (FUR["leg_hem_factor"] + (1 - FUR["leg_hem_factor"]) * t) / FUR["length"]
+
     def constant(value):
         return lambda co: value / FUR["length"]
 
@@ -953,13 +1083,20 @@ def main():
         if obj is body:
             weight, length = body_weight, body_length
         elif obj.name.startswith("Foot"):
-            weight, length = foot_weight, constant(FUR["leg_length"])
+            weight, length = foot_weight, leg_length
         elif obj.name.startswith("Hand"):
             weight, length = paw_weight(PAW_FINGERS[obj.name]), constant(FUR["paw_length"])
         else:
-            weight, length = None, constant(FUR["arm_length"])
+            weight, length = None, arm_length
+        if obj.name.startswith(("Arm", "Foot")):
+            weight = unburied(weight)
         add_fur(obj, fur, parents, weight, length)
         FUR_SYSTEMS[obj.name]["surface_area_m2"] = round(areas[obj.name], 4)
+    for obj in furred:
+        if obj.name.startswith("Hand"):
+            comb_fur(obj, toward=Vector(PAW["finger_target"]), lift=FUR["paw_lift"])
+        else:
+            comb_fur(obj, head_lift=obj is body)
 
     bpy.ops.mesh.primitive_plane_add(size=200, location=(0, 0, -0.008))
     finish(bpy.context.object, "Ground", ground, {"primitive": "plane", "size": 200})

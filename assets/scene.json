@@ -414,7 +414,9 @@
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
           "coat": 0.0,
-          "ior": 1.55
+          "ior": 1.55,
+          "opaque_share": 0.6,
+          "opaque_color": "#e4c9a8"
         }
       ],
       "material": {
@@ -562,7 +564,9 @@
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
           "coat": 0.0,
-          "ior": 1.55
+          "ior": 1.55,
+          "opaque_share": 0.6,
+          "opaque_color": "#e4c9a8"
         }
       ],
       "material": {
@@ -800,7 +804,9 @@
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
           "coat": 0.0,
-          "ior": 1.55
+          "ior": 1.55,
+          "opaque_share": 0.6,
+          "opaque_color": "#e4c9a8"
         }
       ],
       "material": {
@@ -1705,7 +1711,9 @@
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
           "coat": 0.0,
-          "ior": 1.55
+          "ior": 1.55,
+          "opaque_share": 0.6,
+          "opaque_color": "#e4c9a8"
         }
       ],
       "material": {
@@ -1850,7 +1858,9 @@
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
           "coat": 0.0,
-          "ior": 1.55
+          "ior": 1.55,
+          "opaque_share": 0.6,
+          "opaque_color": "#e4c9a8"
         }
       ],
       "material": {
@@ -2054,23 +2064,23 @@
         "palm_roll_degrees": -20,
         "finger_tips": [
           [
-            -0.31327441334724426,
+            -0.31480810046195984,
             -0.8799999952316284,
-            1.9279264211654663
+            1.9059933423995972
           ],
           [
-            -0.28776681423187256,
+            -0.29600316286087036,
             -0.8799999952316284,
-            1.7668778896331787
+            1.7872636318206787
           ],
           [
-            -0.1851523518562317,
+            -0.23409061133861542,
             -0.8799999952316284,
-            1.6401596069335938
+            1.6842238903045654
           ]
         ],
-        "finger_radius": 0.07,
-        "finger_length": 0.13,
+        "finger_radius": 0.08,
+        "finger_length": 0.1,
         "thumb": [
           [
             -0.699999988079071,
@@ -2140,7 +2150,9 @@
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
           "coat": 0.0,
-          "ior": 1.55
+          "ior": 1.55,
+          "opaque_share": 0.6,
+          "opaque_color": "#e4c9a8"
         }
       ],
       "material": {
@@ -2175,12 +2187,12 @@
         },
         "sheen_tint_srgb_hex": "#e8d2b8"
       },
-      "vertices": 15746,
-      "polygons": 19477,
+      "vertices": 15280,
+      "polygons": 18847,
       "dimensions": [
-        0.7510933876037598,
-        0.4998229742050171,
-        0.6033203601837158
+        0.710943341255188,
+        0.499822199344635,
+        0.6033139228820801
       ]
     },
     {
@@ -2242,23 +2254,23 @@
         "palm_roll_degrees": 20,
         "finger_tips": [
           [
-            0.31327441334724426,
+            0.31480810046195984,
             -0.8799999952316284,
-            1.9279264211654663
+            1.9059933423995972
           ],
           [
-            0.28776681423187256,
+            0.29600316286087036,
             -0.8799999952316284,
-            1.7668778896331787
+            1.7872636318206787
           ],
           [
-            0.1851523518562317,
+            0.23409061133861542,
             -0.8799999952316284,
-            1.6401596069335938
+            1.6842238903045654
           ]
         ],
-        "finger_radius": 0.07,
-        "finger_length": 0.13,
+        "finger_radius": 0.08,
+        "finger_length": 0.1,
         "thumb": [
           [
             0.699999988079071,
@@ -2328,7 +2340,9 @@
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
           "coat": 0.0,
-          "ior": 1.55
+          "ior": 1.55,
+          "opaque_share": 0.6,
+          "opaque_color": "#e4c9a8"
         }
       ],
       "material": {
@@ -2363,12 +2377,12 @@
         },
         "sheen_tint_srgb_hex": "#e8d2b8"
       },
-      "vertices": 15746,
-      "polygons": 19477,
+      "vertices": 15280,
+      "polygons": 18847,
       "dimensions": [
-        0.7510933876037598,
-        0.4998229742050171,
-        0.603320837020874
+        0.710943341255188,
+        0.499822199344635,
+        0.6033141613006592
       ]
     },
     {
@@ -9128,7 +9142,7 @@
         2.3
       ],
       "arm_length": 0.05,
-      "paw_length": 0.035,
+      "paw_length": 0.042,
       "leg_length": 0.07,
       "root_radius": 0.0032,
       "tip_radius_factor": 0.1,
@@ -9137,14 +9151,40 @@
       "down_bias": -0.72,
       "comb_back": 0.3,
       "random": 0.3,
-      "clump": 0.75,
+      "clump": 0.5,
       "clump_shape": 0.0,
+      "clump_noise": false,
       "clump_noise_size": 0.4,
       "roughness_uniform": 0.005,
-      "roughness_end": 0.02,
-      "roughness_random": 0.012,
-      "child_length": 0.6,
-      "child_length_threshold": 0.5,
+      "roughness_end": 0.012,
+      "roughness_random": 0.008,
+      "roughness_random_threshold": 0.6,
+      "child_length": 0.75,
+      "child_length_threshold": 0.3,
+      "groom_lift_root": 40,
+      "groom_lift_tip": 12,
+      "groom_jitter": 10,
+      "groom_up_flatten": 0.6,
+      "crown_back_bias": 0.8,
+      "head_lift": [
+        60,
+        35
+      ],
+      "paw_lift": [
+        65,
+        40
+      ],
+      "arm_cap_z": [
+        2.0,
+        2.2
+      ],
+      "arm_cap_factor": 0.35,
+      "leg_hem_z": [
+        0.03,
+        0.15
+      ],
+      "leg_hem_factor": 0.6,
+      "buried_margin": 0.005,
       "kink": "NO",
       "kink_amplitude": 0.0,
       "kink_frequency": 2.0,
@@ -9155,60 +9195,62 @@
       "radial_roughness": 0.4,
       "random_roughness": 0.3,
       "coat": 0.0,
-      "ior": 1.55
+      "ior": 1.55,
+      "opaque_share": 0.6,
+      "opaque_color": "#e4c9a8"
     },
     "systems": {
       "Body": {
-        "parents": 1911,
+        "parents": 1916,
         "children_per_parent": 100,
-        "rendered_strands": 191100,
+        "rendered_strands": 191600,
         "density_vertex_group": true,
         "surface_area_m2": 15.8193
       },
       "Arm Left": {
-        "parents": 154,
+        "parents": 155,
         "children_per_parent": 100,
-        "rendered_strands": 15400,
-        "density_vertex_group": false,
+        "rendered_strands": 15500,
+        "density_vertex_group": true,
         "surface_area_m2": 1.2808
       },
       "Hand Left": {
-        "parents": 125,
+        "parents": 122,
         "children_per_parent": 100,
-        "rendered_strands": 12500,
+        "rendered_strands": 12200,
         "density_vertex_group": true,
-        "surface_area_m2": 1.0396
+        "surface_area_m2": 1.0126
       },
       "Foot Left": {
-        "parents": 263,
+        "parents": 264,
         "children_per_parent": 100,
-        "rendered_strands": 26300,
+        "rendered_strands": 26400,
         "density_vertex_group": true,
         "surface_area_m2": 2.1807
       },
       "Arm Right": {
-        "parents": 154,
+        "parents": 155,
         "children_per_parent": 100,
-        "rendered_strands": 15400,
-        "density_vertex_group": false,
+        "rendered_strands": 15500,
+        "density_vertex_group": true,
         "surface_area_m2": 1.2808
       },
       "Hand Right": {
-        "parents": 125,
+        "parents": 122,
         "children_per_parent": 100,
-        "rendered_strands": 12500,
+        "rendered_strands": 12200,
         "density_vertex_group": true,
-        "surface_area_m2": 1.0396
+        "surface_area_m2": 1.0126
       },
       "Foot Right": {
-        "parents": 263,
+        "parents": 264,
         "children_per_parent": 100,
-        "rendered_strands": 26300,
+        "rendered_strands": 26400,
         "density_vertex_group": true,
         "surface_area_m2": 2.1807
       }
     },
-    "rendered_strands": 299500,
+    "rendered_strands": 299800,
     "excluded": [
       "Face",
       "Eyes",

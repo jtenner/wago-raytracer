@@ -309,3 +309,149 @@ Paw positions are read from a 0.05H grid and are good to about ±0.01H. The refe
 7. **Orb.** Not touched in this pass. Luminosity, filaments and the cyan chest spill are still the fur pass's residuals 2–3.
 8. **Hood depth, eye and smile height, floor.** Not touched; the fur pass's residuals 6, 7 and 9 still apply.
 9. **OBJ.** `mascot.obj/.mtl` was not regenerated, as agreed, and still has the fur-pass hands and thumbs.
+
+## Taming pass
+
+This pass covers the owner's review of the poof render:
+
+- **Fullness and length are approved.** I kept the strand count and lengths.
+- **Too wild.** The coat read feral: wispy strays at the shoulders and elbows, frizz, a ragged edge. The reference reads groomed.
+- **Paws slightly glove-like.** The fingers were more explicit than the reference's.
+
+Everything is in `assets/build_mascot.py` (`FUR`, `PAW`, `comb_fur`, `fur_material`). The render settings are unchanged: Cycles CUDA on the RTX 4060, 512 samples, the same camera, 640×768, 25.2 s. Run the build with
+
+    MUSE_SKIP_OBJ=1 /usr/bin/blender --background --python assets/build_mascot.py
+
+`mascot.obj/.mtl` are still not regenerated, as agreed.
+
+### What made the difference
+
+The dials the poof pass named (clump, tip frizz, the share of short children) were the first step, but they barely moved the edge: stray score 5.31 → 5.17. Three causes were found from crops and A/B renders:
+
+1. **Strand direction.** With emitted hair, a strand's direction is the surface normal plus one fixed comb vector. On the sides, the strands left the skin at about 50° and the random velocity (0.3) scattered them. A comb strong enough to lay the side fur down would push the crown strands into the head. So **`comb_fur` now grooms the parent keys directly.**
+   - Each parent starts at its root and arcs from 40° to 12° above the skin, along the surface tangent of "down and slightly back".
+   - It gets ±10° of azimuth jitter, so the pile is combed but not machined.
+   - It keeps its emitted length, so lengths and fullness are unchanged.
+   - Paws are combed toward the orb. Up-facing surfaces lie flatter (`groom_up_flatten` 0.6). Where the comb runs into the surface, an outward comb is blended in, with a backward bias at the crown (0.8). Without the bias the top radiated from a whorl with a visible parting.
+   - The hood pile stands up more (60° → 35°), like the reference's plush seen end-on. Lying flat there, it read as flakes.
+   - Blender quirks this works around:
+     - Every `co_object_set` invalidates the emitter's evaluated copy. A second Python query on the emitter then crashes Blender or returns empty keys. An untouched twin of the emitter (same mesh and seed, so the same roots) supplies the transform, and is then deleted.
+     - A write through the emitter's own modifier sets the "edited" flag. Without it, the system re-emits on the next evaluation and silently discards the groom.
+     - The saved `.blend` holds the groomed (edited) hair, so change fur settings in the script, not in the UI.
+2. **The arm tops.** The arm ellipsoids stand clear of the body, so their up-facing top caps are fully exposed at the shoulders. Their fur fanned out past the outline. These were the shoulder strays. The fix is 0.35× fur length over the top of the arm (z 2.0 → 2.2), plus no arm or leg roots buried inside the body.
+3. **Translucent edge.** At melanin 0.05 the Chiang hair is nearly clear. Wherever only a few strands overlap at the outline, they rendered as a pale haze, which is the "lives outdoors" ragged edge. The hair shader now mixes in **60% opaque diffuse `#e4c9a8`**, so the edge stays fur-colored like the reference's faux fur. This was the largest single improvement: stray score 5.39 → 2.54.
+4. **Clump noise off.** The Voronoi clump noise (size 0.4) tiled the hood into blocky patches with seams. Without it the crown is smooth and the body keeps its tufts.
+
+### Settings landed on
+
+| | Poof pass | Taming pass |
+|---|---|---|
+| Strands | 299,500 budget (build reports 299,800) | **unchanged** |
+| Length | body 0.085, head 0.042, arms 0.05, paws 0.035, legs 0.07 | **unchanged**, except paws **0.042**, arm-top cap **×0.35**, sole hem (z < 0.15) **×0.6** |
+| Clump | 0.75, noise on (0.4) | **0.5, noise off** |
+| Tip frizz (roughness end) | 0.02 | **0.012** |
+| Random frizz | 0.012 on 60% of children | **0.008 on 40%** (threshold 0.6) |
+| Uniform frizz | 0.005 | 0.005 |
+| Short children (the ragged half-length strays) | 50% at 0.6× | **30% at 0.75×** |
+| Comb | emission: normal + (0, 0.3, −0.72) | **groomed parent keys**: lift 40° → 12°, jitter ±10°, up-facing ×(1 − 0.6·n_z), crown back bias 0.8, hood 60° → 35°, paws 65° → 40° toward the orb |
+| Buried roots | – | none for arm or leg roots inside the body |
+| Hair shader | Chiang only | Chiang mixed with **60% diffuse `#e4c9a8`** |
+| Fingers | radius 0.07, length 0.13, fan +6/−24/−54°, stiffness 5, crease density 5% | **radius 0.08, length 0.10, fan +2/−20/−42°, stiffness 3.5, crease density 70%** |
+| Fingertip reach and orb squash | 0.315 m / 0.262 m | **unchanged**, so the contact is unchanged |
+
+### Compare-and-fix log
+
+Each cycle is a full 512-sample render, measured against the reference with the poof pass's scripts:
+
+- figure-normalized silhouette rows
+- fringe depth
+- edge jitter
+- region colors
+- gridded paw crops
+
+There is one new metric: **stray**, the number of pixels per edge row that lie outside the morphologically opened silhouette, within 0.06H of it, and differ from the local background on that row. Wisps and frizz raise it. It measures **3.20 on the reference** and repeats within ±0.05. The left fringe depth turned out to be noisy: two renders with identical settings gave 18.9 and 34.9.
+
+| Cycle | Change | Height strict/robust | Stray (ref 3.20) | Shoulder / elbow / body / legs (ref 3.10 / 3.33 / 3.02 / 2.05) | Crown jitter (ref 1.12) | Half-width v 0.40 L/R (ref 0.277/0.275) |
+|---|---|---|---|---|---|---|
+| before | poof pass | 0.798 / 0.796 | 5.31 | 3.80 / 3.36 / 7.24 / 5.93 | 1.84 | 0.286 / 0.280 |
+| 1 | clump 0.6, tip frizz 0.012, random frizz 0.008 on 40%, short children 30% at 0.75×; paw fingers shorter, fatter fan, crease 35%, paw fur 0.042 | 0.799 / 0.796 | 5.17 | 4.14 / 3.14 / 6.55 / 5.60 | 2.03 | 0.279 / 0.277 |
+| 2 | parent-key groom | 0.801 / 0.797 | 5.42 | 3.35 / 3.84 / 6.91 / 6.44 | 2.28 | 0.275 / 0.276 |
+| 3 | arm-top cap fur ×0.35, no buried arm or leg roots | 0.802 / 0.798 | 5.39 | **2.63** / 4.43 / 7.15 / 6.15 | 2.27 | 0.273 / 0.269 |
+| 4 | 60% opaque diffuse; flatter up-facing strands; sole hem | 0.798 / 0.797 | **2.54** | 2.08 / 1.73 / 2.67 / 2.14 | 1.30 | 0.275 / 0.275 |
+| 5 | merged fingers (radius 0.08, stiffness 3.5, crease 70%), plush paw lift, warmer diffuse | 0.798 / 0.797 | 2.51 | 2.21 / 2.00 / 2.62 / 1.91 | 1.33 | 0.277 / 0.273 |
+| 6 | up-facing flatten 0.85, clump 0.5 | 0.797 / 0.796 | 2.30 | 1.85 / 1.63 / 2.42 / 1.85 | 1.10 | 0.278 / 0.278 |
+| 7 | blended crown comb, upright hood pile, clump noise off | 0.796 / 0.794 | 2.20 | 2.64 / 1.35 / 1.96 / 1.73 | 0.96 | 0.278 / 0.280 |
+| 8 | flatten 0.7, to recover the crown pixel | 0.796 / 0.796 | 2.07 | 2.17 / 1.43 / 1.97 / 1.71 | 1.06 | 0.278 / 0.277 |
+| **final** | flatten 0.6, sole hem ×0.6, crown back bias 0.8 | **0.798 / 0.796** | **2.04** | 2.17 / 1.37 / 1.91 / 1.74 | 1.07 | 0.277 / 0.281 |
+
+Notes per cycle:
+
+- **Cycles 1–3.** The interior looked combed after cycle 2, but the stray score did not fall until cycle 4. The pale translucent band along the outline dominated it until then.
+- **Cycle 2.** The first attempt rendered identically to cycle 1. The keys were being re-emitted because the "edited" flag was on the twin, not the emitter. Fixed before the numbers above.
+- **Cycle 3** was picked from single-change variants; the rejected and reverted ones are listed below.
+- **Cycle 4, first version (60% diffuse `#c8ab9c`).** The belly went mauve (`#b79792`) and the strict height went to 0.805, because the newly opaque crown and leg-hem fur registered as figure. Warming the color to `#e0c8b0`, then `#e4c9a8`, flattening up-facing strands and shortening the hem brought both back.
+- **Cycle 5.** The paws had become one dim blob with two sausage fingers.
+- **Cycle 6.** The crown outline is right, but blocky tiles remained.
+- **Cycle 7.** Clump noise was the cause of the tiles. Height slipped 1 px.
+- **Final.** The very top had a dark whorl with a parting; the crown back bias removes it.
+
+**Reverted or rejected, with the measured result:**
+
+| Variant | Result | What I did |
+|---|---|---|
+| Tip radius ×0.1 → ×0.3 | stray 5.42 → 5.69; strays more visible | Reverted |
+| No buried roots on every part, including the body and paws | stray 5.81; bared a pole and dark seam at the shoulder | Reverted. Kept for arms and legs only; that effect was measured only in combination with other changes |
+| Arm comb leaning outward 0.5 | strays still fanned past the outline | Reverted |
+| Arm comb leaning inward 0.6 | no fix | Reverted |
+| Rim softbox 340 → 170 W | stray 4.91, a small gain | Not adopted: the opaque shader fixed the edge without touching the lighting |
+| Zero frizz | no measurable change at that stage (cycle 2 base) | Rejected; frizz stays at the cycle 1 values |
+| Flatter lift 25° → 4° | no measurable change at that stage | Rejected |
+| Clump 0.3 | no measurable change at that stage | Rejected |
+| Clump 0.35 (cycle 6 base) | the crown tiles did not change | Rejected; clump stays 0.5 |
+| Clump noise size 0.08 | about the same as noise off | Chose noise off |
+| Second color warm-up `#e2ccaa` | within a level of `#e4c9a8` | Not adopted |
+
+### Anchors, before → final
+
+| Measure | Reference | Before (poof) | Final |
+|---|---|---|---|
+| Height / frame, strict | 0.797 | 0.798 | **0.798** |
+| Height / frame, robust | 0.797 | 0.796 | **0.796** |
+| Background | `#f1eff2` | `#f0efef` | `#f0efef` |
+| Lower belly mean | `#c5ab9e` | `#c2a698` | `#c4a598` |
+| Shade region | `#b3998a` | `#bda292` | `#c09f91` |
+| Lit region | `#c7ab9c` | `#c9af9e` | `#cbad9f` |
+| Leg | `#cbae9b` | `#ceb6a8` | `#d0b5a4` |
+| Eye centers (v) | 0.223 | 0.227 | 0.226 / 0.227 |
+| Orb | – | – | geometry and shader untouched. Visible width reads 0.119 vs 0.122 because the fatter fingers cover a little more of its rim |
+| Paw inner edge | touching the orb | touching | **touching**, \|u\| ≈ 0.07, no gap |
+| Thumb tops (v) | 0.43 / 0.44 | 0.43 | ≈ 0.43 |
+| Paw bottom (v) | 0.595 | 0.60–0.605 | ≈ 0.60 |
+| Half-width L/R, v 0.05 | 0.170 / 0.156 | 0.169 / 0.149 | 0.166 / 0.158 |
+| v 0.40 | 0.277 / 0.275 | 0.286 / 0.280 | 0.277 / 0.281 |
+| v 0.60 | 0.289 / 0.295 | 0.306 / 0.303 | 0.305 / 0.308 |
+| v 0.80 | 0.263 / 0.267 | 0.247 / 0.241 | 0.250 / 0.251 |
+| v 0.90 | 0.222 / 0.226 | 0.213 / 0.210 | 0.214 / 0.219 |
+| Edge jitter, body sides | 1.04 / 1.03 | 1.23 / 1.40 | 1.08 / 0.93 |
+| Edge jitter, crown | 1.12 | 1.84 | 1.07 |
+
+The face, eyes, smile, cheeks, orb, camera and lights are unchanged.
+
+### Side by side
+
+It now reads as the same groomed creature. The pile is long, full and combed downward, with crisp small tufts. The outline is clean all the way round, the shoulders are smooth, and the crown is an even dome. The paws read as round paws with a thumb up: the fingers are one soft lobe with faint creases under short plush fur, cradling the orb.
+
+### What still does not match the reference
+
+1. **The color is slightly cool and mauve.** The reference pile is a warmer peach-tan. The region means are within a few levels (lower belly `#c4a598` vs `#c5ab9e`), but G and B both run about 6 low there. The lit head side is paler and less saturated (`#e7d2c4` vs `#e4cab9`), and the legs are lighter (`#d0b5a4` vs `#cbae9b`). Next to each other, the render looks a touch pinker and greyer. Part of this is the violet orb spill on the chest.
+2. **The shade side is still too light:** `#c09f91` vs `#b3998a`, slightly worse than before (`#bda292`). The opaque diffuse fills in the shadowed fur.
+3. **The edge is now a little cleaner than the reference's.** The stray score is 2.04 against the reference's 3.20. The reference has a fine fuzz of tips that the render lacks in places, so at full size the outline reads slightly velvety rather than long-pile. The lit-side fringe is 48 vs the reference's 71.
+4. **The paws are the same tone as the body.** In the reference, the paws are brighter than the body and cast a soft shadow onto the belly, so they pop. Here their outline against the body is softer and they sit back. The fingers are now hinted, as asked, possibly a touch less than the reference's at the right paw.
+5. **The arms still read as separate forms.** A crease shows where each arm meets the body at the shoulder. In the reference the arm flows into the body.
+6. **Leg junction and elbows (unchanged geometry).** At v 0.8 the figure is 0.013–0.016H narrower, and at v 0.6 it is 0.013–0.016H wider. These are the fur pass's residual 4 and the poof pass's residual 4.
+7. **Not touched:**
+   - orb luminosity, filaments and the cyan chest spill
+   - hood depth
+   - eye and smile height (eyes 0.003–0.004H low)
+   - floor
+   - `mascot.obj/.mtl`, which still has the fur-pass hands and thumbs and no groom
