@@ -19,6 +19,7 @@ import random
 import time
 from pathlib import Path
 
+import bmesh
 import bpy
 from mathutils import Quaternion, Vector
 
@@ -78,24 +79,38 @@ FUR = {
     "coat": 0.0, "ior": 1.55, "opaque_share": 0.6, "opaque_color": "#e4c9a8",
 }
 
-# Paws, right side (mirrored for the left), in world coordinates. Each paw is
-# one metaball mesh shaped like a mitten: a near-spherical palm seated against
-# the orb, three short, fat finger bumps packed close and sloping down onto the
-# orb's lower side, a round thumb nub on top, and a wrist cuff buried in the
-# forearm so the arm flows into the paw. Low stiffness melts the bumps into the
-# ball, and the paw fur veils what is left of them. The bumps aim at a point
-# just behind the orb center; the paw is then pressed softly against the orb.
+# Arms, right side (mirrored for the left), in world coordinates. Each arm and
+# its paw are one smooth tube of uniform radius: it leaves the shoulder (the
+# first point is buried in the body), runs down the side, and turns forward and
+# in to the orb, where its rounded end is the paw. The tube is a dense chain of
+# metaballs, so its thickness is even along the bends and the end closes in a
+# round cap. The last stretch of the tube (paw_reach, measured back from the
+# cap center) is cut off as the paw, with its own materials and fur.
+ARM = {
+    "path": [(0.72, -0.08, 2.18), (0.80, -0.30, 1.88), (0.78, -0.52, 1.70), (0.43, -0.76, 1.745)],
+    "radius": 0.265, "spacing": 0.02, "paw_reach": 0.42,
+    # Strand budget for each arm and its paw together, as an area: the
+    # mitten-pass arm (1.2808 m2) plus paw (1.0643 m2) shares, so the tube
+    # takes no strands from the body or feet. It is split between the arm and
+    # the paw to keep their mitten-pass parent densities (per m2 of furred
+    # skin) in the same ratio; see main().
+    "fur_share_area": 2.3451, "fur_density": {"arm": 217.4, "paw": 124.7},
+}
+
+# Paw details on the tube end, right side. Three short, fat finger bumps packed
+# close and sloping down onto the orb's lower side, and a round thumb nub on
+# top. Low stiffness melts the bumps into the cap, and the paw fur veils what is
+# left of them. The bumps aim at a point just behind the orb center; the paw is
+# then pressed softly against the orb. The bumps' bases are set back toward
+# "palm", the hands-pass palm center, so the bumps keep their hands-pass axes.
 PAW = {
-    "palm": (0.52, -0.71, 1.735), "palm_radii": (0.26, 0.26, 0.27), "palm_roll": 0,
-    "wrist": (0.82, -0.36, 1.70), "wrist_radius": 0.11,
+    "palm": (0.52, -0.71, 1.735),
     "finger_target": (0, -0.88, 1.895), "finger_angles": (-10, -22, -32),
     "finger_radius": 0.10, "finger_reach": 0.335, "finger_length": 0.06,
     "thumb_base": (0.68, -0.76, 1.88), "thumb_tip": (0.63, -0.80, 1.97), "thumb_radius": 0.095,
     "stiffness": 1.6, "thumb_stiffness": 2.4, "threshold": 0.6, "resolution": 0.01,
     "contact_radius": 0.262, "contact_blend": 0.045, "bare_margin": 0.02,
     "crease_density": 1.0,
-    # Hands-pass paw area, used to share the strand budget (see main()).
-    "fur_share_area": 1.0643,
     # Paws read a little lighter than the body in the reference.
     "plush_color": "#b39888", "fur_tint": "#ecd4ca", "fur_opaque_color": "#eed8bc",
 }
@@ -105,7 +120,6 @@ RIG = {
     "eye_x": 0.31, "eye_z": 2.74, "eye_scale": (0.08, 0.042, 0.079),
     "smile_half_width": 0.092, "smile_z": 2.58, "smile_sag": 0.045,
     "cheek_x": 0.35, "cheek_z": 2.56, "cheek_scale": (0.25, 0.03, 0.17),
-    "arm_x": 0.86, "arm_scale": (0.22, 0.26, 0.50),
     "leg_x": 0.455, "leg_radius": 0.315,
     "orb_center": (0, -0.93, 1.895), "orb_spill": 22,
 }
@@ -395,12 +409,45 @@ def metaball_radius(surface_radius, stiffness):
     return surface_radius / math.sqrt(1 - ratio)
 
 
-def make_paw(name, sign, mat, orb_center):
-    # One soft mesh per paw (palm, three stubby fingers and a thumb), so the
-    # fur flows across the knuckles and the creases between fingers stay open.
+def tube_ball_radius(surface_radius, stiffness, spacing):
+    # Balls of radius R every `spacing` along a line sum to a field of about
+    # stiffness / spacing * 32/35 * (R^2 - d^2)^3.5 / R^6 at distance d from it;
+    # find the R that puts the threshold at the surface radius.
+    def field(r):
+        return stiffness / spacing * 32 / 35 * (r * r - surface_radius ** 2) ** 3.5 / r ** 6
+    low, high = surface_radius, 4 * surface_radius
+    for _ in range(60):
+        middle = (low + high) / 2
+        low, high = (middle, high) if field(middle) < PAW["threshold"] else (low, middle)
+    return high
+
+
+def resample(points, spacing):
+    # Evenly spaced points along a polyline, ending exactly on its last point.
+    lengths = [0.0]
+    for a, b in zip(points, points[1:]):
+        lengths.append(lengths[-1] + (Vector(b) - Vector(a)).length)
+    count = max(1, round(lengths[-1] / spacing))
+    out, segment = [], 0
+    for i in range(count + 1):
+        s = lengths[-1] * i / count
+        while segment < len(points) - 2 and lengths[segment + 1] < s:
+            segment += 1
+        span = lengths[segment + 1] - lengths[segment]
+        t = (s - lengths[segment]) / span if span else 0.0
+        out.append(Vector(points[segment]).lerp(Vector(points[segment + 1]), t))
+    return out, lengths[-1]
+
+
+def make_arm(side, sign, mat, paw_mat, orb_center):
+    # One soft mesh per arm: a uniform tube from the shoulder to the orb whose
+    # rounded end is the paw, with the finger bumps and thumb melted into that
+    # end. The mesh is then cut in two at the wrist, so the arm and the paw keep
+    # their own materials and fur, but share one continuous surface.
     def mirrored(point):
         return Vector((sign * point[0], point[1], point[2]))
 
+    name = "Arm " + side
     ball = bpy.data.metaballs.new(name)
     ball.resolution = ball.render_resolution = PAW["resolution"]
     ball.threshold = PAW["threshold"]
@@ -412,7 +459,7 @@ def make_paw(name, sign, mat, orb_center):
         item = ball.elements.new()
         item.type = kind
         item.co = position
-        item.radius = metaball_radius(radius, stiffness)
+        item.radius = radius
         item.stiffness = stiffness
         if rotation is not None:
             item.rotation = rotation
@@ -423,31 +470,28 @@ def make_paw(name, sign, mat, orb_center):
         axis = end - start
         # A capsule element runs along its local X; size_x is its half-length.
         rotation = Vector((1, 0, 0)).rotation_difference(axis.normalized())
-        element("CAPSULE", (start + end) / 2, radius, rotation,
+        stiffness = stiffness or PAW["stiffness"]
+        element("CAPSULE", (start + end) / 2, metaball_radius(radius, stiffness), rotation,
                 (axis.length / 2, 1, 1), stiffness)
 
     palm = mirrored(PAW["palm"])
-    radii = PAW["palm_radii"]
-    scale = max(radii)
-    # Roll the palm so its inner edge rises toward the orb, carrying its weight.
-    roll = Quaternion((0, 1, 0), math.radians(sign * PAW["palm_roll"]))
-    element("ELLIPSOID", palm, scale, roll, tuple(r / scale for r in radii))
+    path = catmull_rom([tuple(mirrored(p)) for p in ARM["path"]], 12)
+    samples, length = resample(path, ARM["spacing"])
+    ball_radius = tube_ball_radius(ARM["radius"], PAW["stiffness"], ARM["spacing"])
+    for point in samples:
+        element("BALL", point, ball_radius)
     target = Vector(PAW["finger_target"])
-    tips, PAW_FINGERS[name] = [], []
+    tips, PAW_FINGERS["Hand " + side] = [], []
     for angle in PAW["finger_angles"]:
         a = math.radians(angle)
         tip = target + PAW["finger_reach"] * Vector((sign * math.cos(a), 0, math.sin(a)))
         base = tip + PAW["finger_length"] * (palm - tip).normalized()
         capsule(base, tip, PAW["finger_radius"])
         tips.append(list(tip))
-        PAW_FINGERS[name].append((base, tip))
+        PAW_FINGERS["Hand " + side].append((base, tip))
     # A firmer field keeps the thumb a distinct nub on the soft mitten.
     capsule(mirrored(PAW["thumb_base"]), mirrored(PAW["thumb_tip"]), PAW["thumb_radius"],
             PAW["thumb_stiffness"])
-    if PAW.get("wrist"):
-        # A fat cuff from the palm into the forearm, so the paw flows out of the
-        # arm instead of sitting on it like a bulb on a stalk.
-        capsule(palm, mirrored(PAW["wrist"]), PAW["wrist_radius"])
 
     bpy.ops.object.select_all(action="DESELECT")
     bpy.context.view_layer.objects.active = obj
@@ -467,17 +511,44 @@ def make_paw(name, sign, mat, orb_center):
             reach = radius if d < radius - blend else radius + (d - radius + blend) ** 2 / (4 * blend)
             vertex.co = orb_center + offset.normalized() * reach
     obj.data.update()
-    return finish(obj, name, mat, {
-        "primitive": "metaball_paw", "palm": list(palm), "palm_radii": list(radii),
-        "palm_roll_degrees": sign * PAW["palm_roll"], "finger_tips": tips,
-        "finger_radius": PAW["finger_radius"], "finger_length": PAW["finger_length"],
+
+    # Cut at the wrist: faces nearest the last paw_reach of the tube are paw.
+    along = [i * length / (len(samples) - 1) for i in range(len(samples))]
+    wrist = length - ARM["paw_reach"]
+
+    def on_paw(co):
+        nearest = min(range(len(samples)), key=lambda i: (samples[i] - co).length_squared)
+        return along[nearest] >= wrist
+    hand = obj.copy()
+    hand.data = obj.data.copy()
+    bpy.context.collection.objects.link(hand)
+    for part, keep_paw in ((obj, False), (hand, True)):
+        mesh = bmesh.new()
+        mesh.from_mesh(part.data)
+        drop = [face for face in mesh.faces if on_paw(face.calc_center_median()) != keep_paw]
+        bmesh.ops.delete(mesh, geom=drop, context="FACES")
+        mesh.to_mesh(part.data)
+        mesh.free()
+    hand.name = hand.data.name = "Hand " + side
+    obj.data.name = name
+    wrist_point = samples[min(range(len(samples)), key=lambda i: abs(along[i] - wrist))]
+    tube_recipe = {
+        "primitive": "metaball_tube", "path": [list(mirrored(p)) for p in ARM["path"]],
+        "path_spline": "catmull_rom", "surface_radius": ARM["radius"],
+        "ball_spacing": ARM["spacing"], "ball_radius": ball_radius, "tube_length": length,
+        "metaball_resolution": PAW["resolution"], "metaball_stiffness": PAW["stiffness"],
+        "wrist_cut": {"point": list(wrist_point), "paw_reach": ARM["paw_reach"]},
+    }
+    finish(obj, name, mat, {**tube_recipe, "part": "arm (shoulder to wrist cut)"})
+    finish(hand, hand.name, paw_mat, {
+        **tube_recipe, "part": "paw (wrist cut to the cap end)", "cap_center": list(samples[-1]),
+        "finger_tips": tips, "finger_radius": PAW["finger_radius"],
+        "finger_length": PAW["finger_length"],
         "thumb": [list(mirrored(PAW["thumb_base"])), list(mirrored(PAW["thumb_tip"]))],
-        "thumb_radius": PAW["thumb_radius"], "metaball_resolution": PAW["resolution"],
-        "metaball_stiffness": PAW["stiffness"], "thumb_stiffness": PAW["thumb_stiffness"],
+        "thumb_radius": PAW["thumb_radius"], "thumb_stiffness": PAW["thumb_stiffness"],
         "orb_contact": {"radius": radius, "smooth_max_blend": blend},
-        "wrist_cuff": [list(palm), list(mirrored(PAW["wrist"]))] if PAW.get("wrist") else None,
-        "wrist_radius": PAW.get("wrist_radius"),
     })
+    return obj, hand
 
 
 def bake_scale(obj):
@@ -988,11 +1059,7 @@ def main():
         cx, cz = sign * RIG["cheek_x"], RIG["cheek_z"]
         blush = sphere("Cheek " + side, (cx, face_y(cx, cz, 0.5) + 0.02, cz), RIG["cheek_scale"], cheek)
         blush.rotation_euler = face_normal(cx, cz, 0.5).to_track_quat("-Y", "Z").to_euler()
-        arm = sphere("Arm " + side, (sign * RIG["arm_x"], -0.245, 1.82), RIG["arm_scale"], plush)
-        # Align the long axis from the hand to the shoulder.
-        axis = Vector((-sign * 0.10, 0.39, 0.67))
-        arm.rotation_euler = axis.to_track_quat("Z", "Y").to_euler()
-        hand = make_paw("Hand " + side, sign, paw_plush, Vector(RIG["orb_center"]))
+        arm, hand = make_arm(side, sign, plush, paw_plush, Vector(RIG["orb_center"]))
         foot = make_leg("Foot " + side, (sign * RIG["leg_x"], -0.05, 0), plush,
                         RIG["leg_radius"])
         furred += [arm, hand, foot]
@@ -1032,9 +1099,10 @@ def main():
         if obj.type == "MESH" and tuple(obj.scale) != (1, 1, 1):
             bake_scale(obj)
     areas = {obj.name: surface_area(obj) for obj in furred}
-    # The paws share the budget by a fixed area, so reshaping them does not
-    # move strands between the other parts.
-    shares = {name: PAW["fur_share_area"] if name.startswith("Hand") else area
+    # Each arm and its paw share one fixed budget (on the arm's entry), so
+    # reshaping them does not move strands to or from the body and feet.
+    shares = {name: ARM["fur_share_area"] if name.startswith("Arm")
+              else 0.0 if name.startswith("Hand") else area
               for name, area in areas.items()}
     total_parents = FUR["children_total"] // FUR["children_per_parent"]
 
@@ -1080,8 +1148,7 @@ def main():
 
     def unburied(weight, host=body):
         # Arm and leg roots inside the body grow out through it as stray tufts
-        # at the shoulders and the belly-leg junction; so would paw roots on the
-        # wrist cuff inside the forearm.
+        # at the shoulders and the belly-leg junction.
         to_host = host.matrix_world.inverted()
         def combined(co):
             local = to_host @ co
@@ -1110,24 +1177,44 @@ def main():
     def constant(value):
         return lambda co: value / FUR["length"]
 
+    def weighted_area(obj, weight):
+        # Skin area that grows fur: each face counts by its mean root weight.
+        values = [weight(obj.matrix_world @ vertex.co) for vertex in obj.data.vertices]
+        return sum(polygon.area * sum(values[i] for i in polygon.vertices) / len(polygon.vertices)
+                   for polygon in obj.data.polygons)
+
+    plans = {}
     for obj in furred:
-        parents = int(total_parents * shares[obj.name] / sum(shares.values()))
         if obj is body:
-            weight, length = body_weight, body_length
+            plans[obj.name] = body_weight, body_length
         elif obj.name.startswith("Foot"):
-            weight, length = foot_weight, leg_length
+            plans[obj.name] = unburied(foot_weight), leg_length
         elif obj.name.startswith("Hand"):
-            arm = bpy.data.objects["Arm " + obj.name.split()[-1]]
-            weight = unburied(paw_weight(PAW_FINGERS[obj.name]), arm)
-            length = constant(FUR["paw_length"])
+            plans[obj.name] = (unburied(paw_weight(PAW_FINGERS[obj.name])),
+                               constant(FUR["paw_length"]))
         else:
-            weight, length = None, arm_length
-        if obj.name.startswith(("Arm", "Foot")):
-            weight = unburied(weight)
-        add_fur(obj, paw_fur if obj.name.startswith("Hand") else fur, parents, weight, length)
+            plans[obj.name] = unburied(None), arm_length
+    parents = {name: int(total_parents * share / sum(shares.values()))
+               for name, share in shares.items()}
+    furred_areas = {}
+    for side in ("Left", "Right"):
+        arm, hand = "Arm " + side, "Hand " + side
+        for name in (arm, hand):
+            furred_areas[name] = weighted_area(bpy.data.objects[name], plans[name][0])
+        budget = parents[arm]
+        want = {arm: ARM["fur_density"]["arm"] * furred_areas[arm],
+                hand: ARM["fur_density"]["paw"] * furred_areas[hand]}
+        parents[arm] = round(budget * want[arm] / (want[arm] + want[hand]))
+        parents[hand] = budget - parents[arm]
+    for obj in furred:
+        weight, length = plans[obj.name]
+        add_fur(obj, paw_fur if obj.name.startswith("Hand") else fur, parents[obj.name], weight, length)
         FUR_SYSTEMS[obj.name]["surface_area_m2"] = round(areas[obj.name], 4)
-        if shares[obj.name] != areas[obj.name]:
-            FUR_SYSTEMS[obj.name]["budget_area_m2"] = shares[obj.name]
+        if obj.name in furred_areas:
+            FUR_SYSTEMS[obj.name]["furred_area_m2"] = round(furred_areas[obj.name], 4)
+            FUR_SYSTEMS[obj.name]["parents_per_m2"] = round(parents[obj.name] / furred_areas[obj.name], 1)
+        if obj.name.startswith("Arm"):
+            FUR_SYSTEMS[obj.name]["budget_area_m2_with_paw"] = ARM["fur_share_area"]
     for obj in furred:
         if obj.name.startswith("Hand"):
             comb_fur(obj, toward=Vector(PAW["finger_target"]), lift=FUR["paw_lift"])

@@ -605,3 +605,100 @@ The renders took 26 s each on Cycles CUDA (RTX 4060 Laptop GPU), at 512 samples.
 4. **Paw tone shifted with the shape, not the materials.** Without the 20° roll, the left paw's top faces the key light less: 185 → 166 in the box (reference 168). The right paw is 195 → 193 (reference 207). Paw materials and fur colors are unchanged. The lit-right vs shaded-left contrast is now closer to the reference, but the right paw is still darker than the reference's.
 5. **The orb contact patch is fuller:** 335 vs 300 vertices on the contact sphere. The squash settings are unchanged, and in the render the press still reads as soft, with no flattened pad.
 6. **Not touched:** the arm ellipsoid (its long lower tip is the main remaining source of the low outer bottom), the orb, lighting, the OBJ export, and all earlier residuals.
+
+## Arm tube pass
+
+The owner's verdict on the mitten pass was that the arm should be one long tube: it looked like a balloon attached to a sausage. In the reference, each arm is a single smooth tube of near-uniform thickness. It runs from the shoulder down the side and turns in to the orb, and the paw is simply the tube's rounded end. This pass rebuilds the arm and paw only. Body, face, hood, orb, background, floor, lighting and camera are unchanged, and so is every fur setting.
+
+`paw-closeup.png` shows the final render's paw region (u −0.33…0.33, v 0.38…0.64 of figure height) above the same region of the reference, both 1200 px wide at matched figure scale, framed exactly like the earlier close-ups.
+
+### Diagnosis
+
+The fur-free harness view of the mitten pass showed two separate forms on each side. One was the arm ellipsoid (radii 0.22 × 0.26 × 0.50), hanging down the body side with its lower tip at z 1.37, below and outside the paw. The other was the metaball paw ball sitting in front of it, joined by a buried cuff. Under fur, that reads as a bulb (the paw) on the end of a fat sausage (the arm), with a dip at the top-outer junction.
+
+### What changed
+
+The arm ellipsoid and the paw's palm ball and cuff are gone. `make_arm()` builds each arm and its paw as **one metaball tube**:
+
+- **Construction:** a dense chain of balls, one every 0.02 m along a Catmull-Rom path. The ball radius (0.328) is solved from the metaball field so the summed field crosses the threshold at the surface radius. The tube is therefore the same thickness everywhere along the path, including the bends, and it closes in a round cap at the end.
+- **Paw details:** the three digit bumps and the thumb are added to the same metaball, so they melt into the tube's end.
+- **Orb contact:** the soft press is applied to the whole mesh, with the same contact settings.
+- **Split:** the mesh is cut in two at the wrist. Faces nearest the last 0.42 m of the centerline become `Hand <side>`; the rest is `Arm <side>`. The two parts share one continuous surface but keep their own materials and fur.
+
+| | Mitten shape pass | Arm tube pass |
+|---|---|---|
+| Arm | ellipsoid at (0.86, −0.245, 1.82), radii (0.22, 0.26, 0.50), long axis along (−0.10, 0.39, 0.67) | **tube, surface radius 0.265 m**, path (0.72, −0.08, 2.18) → (0.80, −0.30, 1.88) → (0.78, −0.52, 1.70) → **cap center (0.43, −0.76, 1.745)**. Centerline length 1.107 m; the first point is buried in the body at the shoulder |
+| Paw | metaball palm (0.52, −0.71, 1.735), radii (0.26, 0.26, 0.27), plus a wrist cuff into the forearm | **the tube's rounded end**: the last 0.42 m of the tube, cut at (0.775, −0.525, 1.699) |
+| Digit bumps, thumb | angles −10/−22/−32°, r 0.10, length 0.06, reach 0.335; thumb (0.68, −0.76, 1.88) → (0.63, −0.80, 1.97), r 0.095, stiffness 2.4 | **unchanged**. The tips are identical, and the bump bases are still set back toward the hands-pass palm point, so their axes are unchanged |
+| Contact | radius 0.262, squash blend 0.045, bare margin 0.02 | **unchanged** |
+| Paw materials, paw fur | `Paw plush` `#b39888`, `Paw faux fur` (tint `#ecd4ca`, opaque `#eed8bc`, 60% opaque share), 0.06 m, lift 65/40° | **unchanged** |
+| Arm material, arm fur | body plush and fur, 0.05 m, short cap at z 2.0–2.2 | **unchanged** |
+
+Measured radius of the final mesh, as the distance from surface vertices to the centerline, in 0.1 m bins along the tube (bump and thumb flanks excluded): the median is **0.256–0.265 m** in every bin. The outside of the elbow bend runs up to 0.009 m thin; the inside of the bend is up to 0.015 m fuller.
+
+### How the paw landing was preserved
+
+The digit tips are unchanged. The cap center was placed so the tube's own rounded end reaches the orb with the bumps melted onto its front. In the first try (cycle 1 screening) the end sat at the old palm center, 0.52, and the bumps formed a narrow snout bridging the cap and the orb. Moving the end to x 0.43 removed the snout. The press uses the same smooth-max contact settings. Measured fur-free from the camera (harness, mitten pass → final):
+
+| Measure | Mitten shape pass | Arm tube pass |
+|---|---|---|
+| Paw inner edge, \|u\| left / right | 0.064 / 0.061 | **0.064 / 0.061** |
+| Front reach (smallest x of the paw in front of the orb center) | 0.181 | **0.183** |
+| Paw mesh vertices on the contact sphere (same measure for both) | 139 | **111**: the same squash on a rounder cap gives a slightly smaller contact patch. In the render the press still reads as soft, with fur running to the glass |
+| Paw top, z | 2.074 | 2.065 |
+| Lowest point of arm + paw, z | 1.371 (the ellipsoid tip) | **1.435** |
+
+### Fur bookkeeping
+
+The mitten pass pinned only the paws' budget area. This pass pins **each arm and its paw together** to their mitten-pass budget area: 1.2808 + 1.0643 = **2.3451 m²** (`ARM["fur_share_area"]`). The sum of all budget areas (24.8709 m²) is therefore unchanged, and the body and feet get exactly the same parents as before. The tube can neither take strands from them nor give strands to them.
+
+Each side's 282 parents are then split between arm and paw in proportion to (mitten-pass density × new furred area). Furred area is the skin area weighted by each object's own fur-density weights, so it excludes roots buried in the body and the bare pad on the orb. The mitten-pass densities are 217.4 parents/m² on the arm and 124.7 on the paw, measured from that pass's `mascot.blend`. `scene.json` now records `furred_area_m2` and `parents_per_m2` for every arm and paw.
+
+| Per side | Mitten shape pass | Arm tube pass |
+|---|---|---|
+| Arm: parents / furred area / density | 154 / 0.708 m² / 217.4 per m² | **161 / 0.678 m² / 237.6 per m²** (+9.3%) |
+| Paw: parents / furred area / density | 128 / 1.026 m² / 124.7 per m² | **121 / 0.887 m² / 136.4 per m²** (+9.4%) |
+| Arm + paw | 282 / 1.734 m² | **282 / 1.565 m²** |
+| Body / foot parents | 1908 / 263 | **1908 / 263** |
+| Total rendered strands | 299,800 | **299,800** |
+
+The tube has 9.7% less furred skin than the ellipsoid plus the paw bulb had, so a fixed budget raises both densities by about 9%. The only way to hold the old densities would be to drop about 25 parents per side from the 300k total, which this pass was told to keep. The arm-to-paw density ratio is held at the mitten-pass value. 7 parents per side moved from the paw to the arm, because the paw's share of the furred skin fell (from 59% to 57%).
+
+### Compare-and-fix log
+
+Geometry was screened in a fur-free Workbench harness (camera, side, top and below views). The harness imports `make_arm` from the script and records silhouette extents, contact-sphere vertices and front reach. Variants g1–g12 were screened there; for measurements the paw part is drawn as a green mask. Then came three full 512-sample Cycles CUDA renders (cycles 1–3). Each was compared with the reference in a full-figure crop, an arm crop (u ±0.45, v 0.30–0.72) and the paw close-up, and the differences were written down before the next change. Half-widths are for the shaded left side; on the key-lit right side, the bright fur edge falls above the background threshold in both images. Luminance boxes are 0.05H at (∓0.19, 0.52) and (0, 0.70).
+
+| Cycle | Change | Left half-width at v 0.50 / 0.58 / 0.62 (ref 0.315 / 0.304 / 0.275) | Paw L / R / belly (ref 169 / 208 / 183) | What the comparison showed |
+|---|---|---|---|---|
+| 0 | mitten pass, as committed | 0.316 / 0.312 / 0.289 | 169 / 195 / 169 | A sausage-and-balloon arm: an ellipsoid down the side, a separate paw bulb in front, a dip where they meet, and the ellipsoid tip hanging below the paw |
+| – | harness g1: tube r 0.24, end at the old palm center | – | – | One continuous tube, but the bumps formed a narrow snout between the cap and the orb (top and below views). Rejected |
+| – | harness g2–g4: end moved to x 0.42–0.45, r 0.25 | – | – | The cap itself meets the orb, with no snout |
+| 1 | tube r 0.25, path via (0.86, −0.27, 1.88), (0.84, −0.50, 1.70), end (0.42, −0.76, 1.75), wrist cut 0.30 | **0.330** / 0.307 / 0.283 | 169 / 198 / 169 | The arm reads as one tube from the shoulder to the orb, and the balloon is gone. But the elbow sticks out 0.015H past the reference at v 0.50–0.54, and the tube reads a little thinner than the reference's forearm |
+| – | harness g5–g7: upper path pulled in and forward, r 0.255–0.265 | – | – | g5 matches the mitten pass's surface extent at v 0.42–0.54 within 0.002H |
+| 2 | g5: r 0.265, path (0.72, −0.08, 2.18) → (0.80, −0.30, 1.88) → (0.78, −0.52, 1.70) → (0.43, −0.76, 1.745) | 0.317 / 0.296 / 0.283 | 170 / 200 / 168 | Width back on the reference, and the tube is thicker. But the left thumb showed a light, pointed flake with a parting outside it: the wrist cut at 0.30 ran through the thumb's outer base, so down-combed arm fur and orb-combed paw fur met there |
+| – | harness g8, g9: cut at 0.42 / 0.48 | – | – | At 0.42 the whole thumb base is about 0.1 m inside the paw. At 0.48 the lighter paw would cover most of the visible forearm, like a sleeve. 0.42 chosen |
+| **3 = final** | wrist cut 0.30 → 0.42 | **0.316 / 0.296 / 0.283** | **170 / 196 / 168** | The flake and parting are gone, and both thumbs are fur-covered nubs. Each arm is one tube from the shoulder to a rounded paw end at the orb, with no waist, bulge or neck, and no visible line at the cut. The fur runs to the glass |
+| – | harness g10–g12: forearm turned to point more toward the camera, cap end fixed | – | – | Lowered the paw underside at the orb by at most 0.01H, but lowered the elbow and changed the outer silhouette. Rejected |
+
+The final build in `assets/` is cycle 3 (identical `preview.png`). The renders took 25.5 s each on Cycles CUDA (RTX 4060 Laptop GPU) at 512 samples; a full build with fur grooming takes about 5½ minutes.
+
+### Anchors, mitten pass → final
+
+| Measure | Mitten shape pass | Arm tube pass |
+|---|---|---|
+| Figure rows, top / bottom (height ≈ 0.798) | 68 / 680 | **68 / 680** |
+| Figure columns | 124 / 511 | 124 / 509 |
+| Left half-width at v 0.42 / 0.46 / 0.54 (ref 0.284 / 0.306 / 0.317) | 0.291 / 0.307 / 0.317 | 0.294 / 0.309 / 0.316 |
+| Pixels outside the arm box (\|u\| < 0.36, 0.33 < v < 0.68) | – | mean difference 0.22; 105 pixels above 20 levels (max 31), all at u 0.1–0.2, v ≈ 0.7: the right forearm's cast shadow on the belly moved with the new arm |
+| `mascot.obj/.mtl` | – | not regenerated (`MUSE_SKIP_OBJ=1`; checksums unchanged) |
+
+### Residuals
+
+1. **The thumb fur peaks.** The thumb geometry is unchanged, but the tube top behind it now carries paw fur, combed toward the orb with the 65° paw lift. That fur converges on the thumb's back, so each nub ends in a small upward tuft where the reference has a round nub. Fixing it would mean moving the thumb or changing the paw comb, both held in this pass.
+2. **The paw end still narrows into the orb.** The underside rises from about v 0.60 to about 0.58 at the glass (fur-free 0.583–0.594 at \|u\| 0.10). The reference's paw meets the orb at full height. Pointing the forearm toward the camera (g10, g11) gained at most 0.01H, so the remaining cause is the fixed bump angles.
+3. **The radius is uniform, but not exactly.** The outside of the elbow bend is up to 0.009 m thin and the inside up to 0.015 m full, and the thumb and bumps add up to about 0.05 m locally at the end.
+4. **Fur density on the arm and paw is about 9% higher** than in the mitten pass (see above), because the budget is fixed and the furred skin is smaller.
+5. **The contact patch is a little smaller:** 111 vs 139 vertices on the contact sphere, with the same squash settings on a rounder cap. The inner edge position is unchanged.
+6. **The arm separates from the chest less than in the reference.** The reference has a darker crease along the arm's inner and top contour. Here the tube's upper part blends softly into the body, which is a lighting and shading difference that was not touched.
+7. **At the wrist cut, the groom changes** from down-combed arm fur to orb-combed paw fur, and the paw is lighter. No line shows at this render size; a much closer view might show the change.
+8. **Not touched:** `mascot.obj/.mtl` (still the fur-pass hands and ellipsoid arms), the orb, lighting (the lit right paw is still darker than the reference's, 196 vs 208), and all earlier residuals.
