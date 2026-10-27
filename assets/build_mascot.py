@@ -47,9 +47,10 @@ FACE = {"z": 2.75, "half_width": 0.645, "half_height": 0.505, "exponent": 2.6}
 
 FUR = {
     # "length" is the longest strand (lower body); regions scale it down so the
-    # head stays short around the face and the paws keep their fingers.
+    # head stays short around the face; paw fur is long enough to veil the
+    # finger bumps.
     "length": 0.085, "head_length": 0.042, "head_blend_z": (2.0, 2.3),
-    "arm_length": 0.05, "paw_length": 0.042, "leg_length": 0.07,
+    "arm_length": 0.05, "paw_length": 0.06, "leg_length": 0.07,
     "root_radius": 0.0032, "tip_radius_factor": 0.1,
     "children_total": 300000, "children_per_parent": 100,
     "down_bias": -0.72, "comb_back": 0.3, "random": 0.3, "clump": 0.5, "clump_shape": 0.0,
@@ -65,7 +66,7 @@ FUR = {
     "groom_lift_root": 40, "groom_lift_tip": 12, "groom_jitter": 10,
     "groom_up_flatten": 0.6, "crown_back_bias": 0.8,
     # The hood pile stands up more, like plush seen end-on; paw fur stands up
-    # as short plush so the thumb and the hinted fingers keep their shape.
+    # as short plush so the thumb nub and the mitten keep their shape.
     "head_lift": (60, 35), "paw_lift": (65, 40),
     # Shorter fur on the arm tops (which stand proud of the shoulders) and at
     # the sole hem; no arm or leg roots buried inside the body.
@@ -78,17 +79,21 @@ FUR = {
 }
 
 # Paws, right side (mirrored for the left), in world coordinates. Each paw is
-# one metaball mesh: a palm tilted with its inner edge up, three stubby fingers
-# fanned around the orb's lower side, and a thumb leaning in from the top. The
-# fingers aim at a point just behind the orb center; the paw is then squashed
-# against the orb so the contact patches flatten and bulge slightly.
+# one metaball mesh shaped like a mitten: a palm tilted with its inner edge up,
+# three short, fat finger bumps packed close and sloping down onto the orb's
+# lower side, and a round thumb nub on top. Low stiffness melts the bumps into
+# one lobe, and the paw fur veils what is left of them. The bumps aim at a point
+# just behind the orb center; the paw is then pressed softly against the orb.
 PAW = {
-    "palm": (0.60, -0.76, 1.70), "palm_radii": (0.27, 0.25, 0.24), "palm_roll": 20,
-    "finger_target": (0, -0.88, 1.895), "finger_angles": (2, -20, -42),
-    "finger_radius": 0.08, "finger_reach": 0.315, "finger_length": 0.10,
-    "thumb_base": (0.70, -0.76, 1.86), "thumb_tip": (0.60, -0.84, 1.98), "thumb_radius": 0.08,
-    "stiffness": 3.5, "threshold": 0.6, "resolution": 0.01,
-    "contact_radius": 0.262, "contact_blend": 0.025, "crease_density": 0.7,
+    "palm": (0.60, -0.76, 1.73), "palm_radii": (0.27, 0.25, 0.28), "palm_roll": 20,
+    "finger_target": (0, -0.88, 1.895), "finger_angles": (-10, -22, -32),
+    "finger_radius": 0.10, "finger_reach": 0.335, "finger_length": 0.06,
+    "thumb_base": (0.68, -0.76, 1.88), "thumb_tip": (0.63, -0.80, 1.97), "thumb_radius": 0.095,
+    "stiffness": 1.6, "thumb_stiffness": 2.4, "threshold": 0.6, "resolution": 0.01,
+    "contact_radius": 0.262, "contact_blend": 0.045, "bare_margin": 0.02,
+    "crease_density": 1.0,
+    # Paws read a little lighter than the body in the reference.
+    "plush_color": "#b39888", "fur_tint": "#ecd4ca", "fur_opaque_color": "#eed8bc",
 }
 
 # Feature placement, matched to the reference in compare-and-fix passes.
@@ -379,10 +384,10 @@ def make_leg(name, position, mat, radius=0.29, fillet=0.11, top=0.95):
     })
 
 
-def metaball_radius(surface_radius):
+def metaball_radius(surface_radius, stiffness):
     # A Blender metaball's field is stiffness * (1 - d^2/R^2)^3, so a lone
     # element's surface sits inside its nominal radius R.
-    ratio = (PAW["threshold"] / PAW["stiffness"]) ** (1 / 3)
+    ratio = (PAW["threshold"] / stiffness) ** (1 / 3)
     return surface_radius / math.sqrt(1 - ratio)
 
 
@@ -398,23 +403,24 @@ def make_paw(name, sign, mat, orb_center):
     obj = bpy.data.objects.new(name, ball)
     bpy.context.collection.objects.link(obj)
 
-    def element(kind, position, radius, rotation=None, size=(1, 1, 1)):
+    def element(kind, position, radius, rotation=None, size=(1, 1, 1), stiffness=None):
+        stiffness = stiffness or PAW["stiffness"]
         item = ball.elements.new()
         item.type = kind
         item.co = position
-        item.radius = metaball_radius(radius)
-        item.stiffness = PAW["stiffness"]
+        item.radius = metaball_radius(radius, stiffness)
+        item.stiffness = stiffness
         if rotation is not None:
             item.rotation = rotation
         item.size_x, item.size_y, item.size_z = size
         return item
 
-    def capsule(start, end, radius):
+    def capsule(start, end, radius, stiffness=None):
         axis = end - start
         # A capsule element runs along its local X; size_x is its half-length.
         rotation = Vector((1, 0, 0)).rotation_difference(axis.normalized())
         element("CAPSULE", (start + end) / 2, radius, rotation,
-                (axis.length / 2, 1, 1))
+                (axis.length / 2, 1, 1), stiffness)
 
     palm = mirrored(PAW["palm"])
     radii = PAW["palm_radii"]
@@ -431,7 +437,9 @@ def make_paw(name, sign, mat, orb_center):
         capsule(base, tip, PAW["finger_radius"])
         tips.append(list(tip))
         PAW_FINGERS[name].append((base, tip))
-    capsule(mirrored(PAW["thumb_base"]), mirrored(PAW["thumb_tip"]), PAW["thumb_radius"])
+    # A firmer field keeps the thumb a distinct nub on the soft mitten.
+    capsule(mirrored(PAW["thumb_base"]), mirrored(PAW["thumb_tip"]), PAW["thumb_radius"],
+            PAW["thumb_stiffness"])
 
     bpy.ops.object.select_all(action="DESELECT")
     bpy.context.view_layer.objects.active = obj
@@ -457,6 +465,7 @@ def make_paw(name, sign, mat, orb_center):
         "finger_radius": PAW["finger_radius"], "finger_length": PAW["finger_length"],
         "thumb": [list(mirrored(PAW["thumb_base"])), list(mirrored(PAW["thumb_tip"]))],
         "thumb_radius": PAW["thumb_radius"], "metaball_resolution": PAW["resolution"],
+        "metaball_stiffness": PAW["stiffness"], "thumb_stiffness": PAW["thumb_stiffness"],
         "orb_contact": {"radius": radius, "smooth_max_blend": blend},
     })
 
@@ -470,14 +479,15 @@ def bake_scale(obj):
     obj.select_set(False)
 
 
-def fur_material():
-    mat = bpy.data.materials.new("Long pile faux fur")
+def fur_material(name="Long pile faux fur", tint_hex=None, opaque_hex=None):
+    tint_hex, opaque_hex = tint_hex or FUR["tint"], opaque_hex or FUR["opaque_color"]
+    mat = bpy.data.materials.new(name)
     mat.use_nodes = True
     nodes, links = mat.node_tree.nodes, mat.node_tree.links
     nodes.remove(nodes.get("Principled BSDF"))
     hair = nodes.new("ShaderNodeBsdfHairPrincipled")
     hair.parametrization = "MELANIN"
-    tint = rgb(FUR["tint"])
+    tint = rgb(tint_hex)
     for socket, value in {
         "Melanin": FUR["melanin"], "Melanin Redness": FUR["melanin_redness"],
         "Tint": (*tint, 1), "Roughness": FUR["roughness"],
@@ -489,7 +499,7 @@ def fur_material():
     # transmits so much that the thin outer layer of the pile reads as a pale
     # haze; a share of opaque diffuse keeps the silhouette edge fur-colored.
     diffuse = nodes.new("ShaderNodeBsdfDiffuse")
-    diffuse.inputs["Color"].default_value = (*rgb(FUR["opaque_color"]), 1)
+    diffuse.inputs["Color"].default_value = (*rgb(opaque_hex), 1)
     mix = nodes.new("ShaderNodeMixShader")
     mix.inputs["Fac"].default_value = FUR["opaque_share"]
     links.new(hair.outputs[0], mix.inputs[1])
@@ -498,10 +508,11 @@ def fur_material():
     mat.diffuse_color = (*tint, 1)
     MATERIALS[mat.name] = {
         "name": mat.name, "type": "principled_hair_chiang", "parametrization": "melanin",
-        "base_color_srgb_hex": FUR["tint"], "base_color": list(tint),
-        **{k: FUR[k] for k in ("melanin", "melanin_redness", "tint", "roughness",
+        "base_color_srgb_hex": tint_hex, "base_color": list(tint),
+        **{k: FUR[k] for k in ("melanin", "melanin_redness", "roughness",
                                "radial_roughness", "random_roughness", "coat", "ior",
-                               "opaque_share", "opaque_color")},
+                               "opaque_share")},
+        "tint": tint_hex, "opaque_color": opaque_hex,
     }
     return mat
 
@@ -946,6 +957,12 @@ def main():
     violet = material("Pink light filament", "#ff6fd8", 0.4, emission=6)
     blue = material("Cyan light filament", "#45e0ff", 0.4, emission=6)
     fur = fur_material()
+    # The paws read lighter than the body in the reference, so they get their
+    # own, slightly brighter plush and fur; the body materials are unchanged.
+    paw_plush = material("Paw plush", PAW["plush_color"], 0.91, texture=True, sheen=1.0)
+    paw_plush.node_tree.nodes.get("Principled BSDF").inputs["Sheen Tint"].default_value = (*rgb("#e8d2b8"), 1)
+    MATERIALS[paw_plush.name]["sheen_tint_srgb_hex"] = "#e8d2b8"
+    paw_fur = fur_material("Paw faux fur", PAW["fur_tint"], PAW["fur_opaque_color"])
 
     body = make_body(plush)
     make_face(cream)
@@ -965,7 +982,7 @@ def main():
         # Align the long axis from the hand to the shoulder.
         axis = Vector((-sign * 0.10, 0.39, 0.67))
         arm.rotation_euler = axis.to_track_quat("Z", "Y").to_euler()
-        hand = make_paw("Hand " + side, sign, plush, Vector(RIG["orb_center"]))
+        hand = make_paw("Hand " + side, sign, paw_plush, Vector(RIG["orb_center"]))
         foot = make_leg("Foot " + side, (sign * RIG["leg_x"], -0.05, 0), plush,
                         RIG["leg_radius"])
         furred += [arm, hand, foot]
@@ -1031,8 +1048,8 @@ def main():
     def paw_weight(fingers):
         def weight(co):
             # Bare pads where the paw touches the orb, so no strands poke into the
-            # glass, and sparse fur in the creases so the fingers stay separate.
-            if (co - orb_center).length < PAW["contact_radius"] + 0.04:
+            # glass; crease_density can thin the fur between the finger bumps.
+            if (co - orb_center).length < PAW["contact_radius"] + PAW["bare_margin"]:
                 return 0.0
             near = sorted(segment_distance(co, *finger) for finger in fingers)
             if near[1] < PAW["finger_radius"] + 0.03 and near[1] - near[0] < 0.025:
@@ -1090,7 +1107,7 @@ def main():
             weight, length = None, arm_length
         if obj.name.startswith(("Arm", "Foot")):
             weight = unburied(weight)
-        add_fur(obj, fur, parents, weight, length)
+        add_fur(obj, paw_fur if obj.name.startswith("Hand") else fur, parents, weight, length)
         FUR_SYSTEMS[obj.name]["surface_area_m2"] = round(areas[obj.name], 4)
     for obj in furred:
         if obj.name.startswith("Hand"):

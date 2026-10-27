@@ -455,3 +455,82 @@ It now reads as the same groomed creature. The pile is long, full and combed dow
    - eye and smile height (eyes 0.003–0.004H low)
    - floor
    - `mascot.obj/.mtl`, which still has the fur-pass hands and thumbs and no groom
+
+## Hands pass
+
+The owner judged the fur and everything else acceptable after the taming pass, but the hands still read wrong. The fingers were too long, too separate and too structured, so the paws read as small hands gripping the orb, and the contact squash read as squeezing. This pass changes only the two paws. Everything else is held at the taming values: body, face, hood, arms, legs, orb, camera, lights, floor, background and every fur setting other than paw fur length.
+
+`paw-closeup.png` shows the final render's orb-and-paw region at 1200 px wide, above the same region of the reference at matched figure scale (u −0.33…0.33, v 0.38…0.64 of figure height), so the hands can be judged without zooming the full frame.
+
+### What changed
+
+All of it is in `PAW` and the paw branch of `build_mascot.py`:
+
+| | Taming pass | Hands pass |
+|---|---|---|
+| Finger bumps: radius / length | 0.08 / 0.10 | **0.10 / 0.06** (short, fat bumps) |
+| Fan | +2 / −20 / −42° | **−10 / −22 / −32°**: packed closer, and sloping down onto the orb's lower side instead of wrapping its rim |
+| Reach from the finger target | 0.315 | **0.335**, so that with the fatter bumps the inner surface reaches the same depth on the orb |
+| Metaball stiffness | 3.5 | **1.6**: a wider field melts the bumps and the palm into one convex mitten. Surface radii stay corrected for stiffness |
+| Thumb | base (0.70, −0.76, 1.86), tip (0.60, −0.84, 1.98), r 0.08, stiffness 3.5 | base (0.68, −0.76, **1.88**), tip (0.63, −0.80, **1.97**), r **0.095**, **own stiffness 2.4**: a rounder, shorter nub that stays distinct on the soft mitten. Top ≈ 2.06 m as before |
+| Palm | center z 1.70, radii (0.27, 0.25, 0.24) | center z **1.73**, radii (0.27, 0.25, **0.28**): taller and more compact, with the bottom unchanged (1.46 → 1.45 m) |
+| Orb contact | squash blend 0.025; bare pads within contact radius + 0.04 | squash blend **0.045** (a softer, rounded press); bare pads within contact radius **+ 0.02** (`bare_margin`), so the fur runs up to the glass |
+| Crease density | 70% | **100%** (no thinning between the bumps) |
+| Paw fur length | 0.042 m | **0.06 m**, veiling what is left of the bumps |
+| Paw materials | shared body `Warm beige plush` `#a38878` and `Long pile faux fur` (tint `#e2c4bc`, opaque `#e4c9a8`) | own **`Paw plush` `#b39888`** and **`Paw faux fur`**: tint `#ecd4ca`, opaque diffuse `#eed8bc`. Same 60% opaque share and the same Chiang settings. The body materials are untouched |
+
+`fur_material()` now takes a name and colors, so the paws can have their own copy. `metaball_radius()` takes the stiffness so the thumb can differ. Contact radius (0.262), finger target, palm roll, paw lift (65° → 40°) and the orb are unchanged.
+
+### Compare-and-fix log
+
+The pass ran nine full 512-sample GPU renders, cycles 0 to 9; the identity check is not counted. Each cycle was compared against the reference in a grid-free matched-scale crop of the orb-and-paw region (reference above, render below), and the differences were written down before the next change. A gridded crop was used for extents. Paw brightness is the mean of 0.05H boxes on each paw's top and the belly at (0, 0.70).
+
+| Cycle | Change | Paw L / paw R / belly luminance (ref 169 / 207 / 181) | Paw / belly (ref 1.04; lit paw 1.14) | What the paw crop showed |
+|---|---|---|---|---|
+| 0 | taming pass, as committed | 162 / 188 / 167 | 1.05 | A tall, pointed, ear-like thumb. Three finger lobes fanned vertically round the orb's sides, which reads as a grip. Creases showed through the short fur. A bare, flat pad was pressed on the orb. The paws were the same tone as the body |
+| – | identity check: materials split out with unchanged colors | 162 / 188 / 167 | 1.05 | Identical numbers to cycle 0, so the refactor is neutral |
+| 1 | bumps r 0.10 / len 0.04, fan −4/−18/−32, stiffness 2.2, reach 0.335, crease 100%, rounder thumb, fur 0.06, brighter paw materials | 184 / 193 / 166 | 1.14 | No digits read. The paws are lighter than the body and read as mittens at full frame. But the front lobe had a flat, horizontal top from thumb to orb (a sleeve or boxing glove), and the thumb was still a raised lump |
+| 2 | fan −10/−24/−36, thumb r 0.095 and lowered | 180 / 198 / 167 | 1.13 | The front rolls down onto the orb, giving a mitten dome with a thumb nub. Left: a bare, flattened contact strip (the squeeze cue), and a long flat underside shelf |
+| 3 | bare margin 0.04 → 0.02, squash blend 0.025 → 0.045 (values now baked into the script) | 179 / 198 / 167 | 1.13 | The contact strip is gone: fur runs to the glass, with no strands inside the orb at 4× zoom. Left: the underside still runs as a shelf under the orb |
+| 4 | fan −10/−22/−32 | 178 / 195 / 167 | 1.11 | The inner lower corner now curves up into the orb (cupping). But a waist formed between the palm and the front lobe, so the front read as one big digit |
+| 5 | stiffness 2.2 → 1.6, bump length 0.04 → 0.06 | 181 / 196 / 166 | 1.14 | Each paw is one convex mitten mass; the waist is filled. But the thumb melted into the dome |
+| 6 | thumb gets its own stiffness 3.0 | 174 / 197 / 166 | 1.12 | The thumb nub is back with a soft notch, but it is a little pointed and ear-like on the left |
+| 7 | thumb stiffness 2.4 | 182 / 194 / 166 | 1.13 | A round thumb nub on both paws. At close-up, the paws were shallower than the reference's (mitten mass v ≈ 0.47–0.60 vs 0.45–0.60), so they read slightly elongated |
+| 8 | palm z +0.03, z radius 0.24 → 0.28 | 181 / 196 / 166 | 1.13 | More compact and taller, as in the reference, but the taller palm swallowed the thumb |
+| **9 = final** | thumb raised 0.03 to match | **181 / 193 / 166** | **1.13** | Compact, rounded mittens with a soft thumb nub, fur-veiled, no digits, lighter than the body, cupping the orb's lower sides |
+
+### Paw-region comparison, final vs reference
+
+| Measure (fraction of figure height) | Reference | Taming pass | Hands pass |
+|---|---|---|---|
+| Digits | not readable; one rounded mitten front | three separated lobes fanned round the orb rim | **not readable**: one convex front lobe under 0.06 m fur |
+| Thumb | low, rounded nub with a soft notch | tall, pointed nub | **rounded nub** with a soft notch (weaker on the right paw) |
+| Thumb tops (v) | 0.43 / 0.44 | ≈ 0.43 | **≈ 0.43** |
+| Paw bottom (v) | 0.595 | ≈ 0.60 | **≈ 0.60–0.605** |
+| Outer paw edge (u) | −0.28 / +0.28 | −0.27 / +0.27 | **−0.27 / +0.27** |
+| Paw inner edge | touching the orb's lower sides | touching, flat bare pad | **touching**, \|u\| ≈ 0.07–0.08, no gap, fur to the glass |
+| Paw top tone, left / right | `#bca598` / `#e1cabd` | `#bb9c8c` / `#d1b7aa` | **`#cbafa1` / `#d4bdaf`** |
+| Paw / belly luminance | 1.04 (lit paw 1.14) | 1.05 | **1.13** |
+
+### Anchors outside the paws, taming → final
+
+| Measure | Taming pass | Hands pass |
+|---|---|---|
+| Height, strict / robust | 0.798 / 0.796 | **0.798 / 0.797** |
+| Eyes (v) | 0.226 / 0.227 | 0.226 / 0.227 |
+| Orb center / visible width | (−0.012, 0.492) / 0.119 | (−0.012, 0.492) / 0.122. The geometry is untouched; the less-wrapping fingers cover less of the rim |
+| Stray (ref 3.20) | 2.04 | 2.09 |
+| Lower belly / shade / lit / leg | `#c4a598` / `#c09f91` / `#cbad9f` / `#d0b5a4` | `#c4a598` / `#c1a193` / `#cdafa1` / `#d0b5a4` |
+| Half-width L/R at v 0.40 / 0.60 / 0.80 | 0.277/0.281, 0.305/0.308, 0.250/0.251 | 0.277/0.279, 0.308/0.307, 0.251/0.251 |
+| Total rendered strands | 299,800 | 299,800 |
+
+The renders took 25.7 s each on Cycles CUDA (RTX 4060 Laptop GPU), at 512 samples. `MUSE_SKIP_OBJ=1` was set, so `mascot.obj/.mtl` were not regenerated.
+
+### Residuals
+
+1. **The paw front tapers toward the orb.** The reference mitten's rounded front faces the camera and meets the orb as a full curve. Here, the bumps are aimed at the orb from the side, so the paw narrows slightly where it presses the glass, most visibly on the right paw. A fix would turn the bump axis toward the camera (move `finger_target` forward or rotate the fan out of the XZ plane). That changes the fingertip reach onto the orb's front, which this pass was told to hold, so it was not done.
+2. **The right thumb nub is weaker than the reference's.** The left is close.
+3. **The paw shading is flatter than the reference's.** The reference's lit right paw is brighter (207 vs 193), and its shaded left paw is darker (169 vs 181). The lighter paw fur raises both sides evenly. A shadow-side darkening would need a lighting or shader gradient, which is outside this pass.
+4. **The soft cast shadow under the paws onto the belly and orb glow is fainter than the reference's.** The geometry casts it, but the reference's darker crescent comes from its lighting, which was not touched.
+5. **The strand distribution moved slightly.** The 300k budget is split across parts by surface area (unchanged code). The taller paws gained area: the paws went from 122 to 128 parents each. Body went from 1,916 to 1,908 (−0.4%), and each arm and foot lost 1 parent (−100 strands). The total, and every fur setting except paw length, is unchanged; stray and region colors stayed at noise level. To hold the other counts exactly, the allocation would need to pin non-paw parent counts. That is a change outside the paws, so it is left for the owner.
+6. **Not touched:** `mascot.obj/.mtl` (still the fur-pass hands), the orb (its rendered size remains smaller than the reference's), and all the taming-pass residuals above.

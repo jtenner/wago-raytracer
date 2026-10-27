@@ -409,13 +409,13 @@
           ],
           "melanin": 0.05,
           "melanin_redness": 0.25,
-          "tint": "#e2c4bc",
           "roughness": 0.32,
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
           "coat": 0.0,
           "ior": 1.55,
           "opaque_share": 0.6,
+          "tint": "#e2c4bc",
           "opaque_color": "#e4c9a8"
         }
       ],
@@ -559,13 +559,13 @@
           ],
           "melanin": 0.05,
           "melanin_redness": 0.25,
-          "tint": "#e2c4bc",
           "roughness": 0.32,
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
           "coat": 0.0,
           "ior": 1.55,
           "opaque_share": 0.6,
+          "tint": "#e2c4bc",
           "opaque_color": "#e4c9a8"
         }
       ],
@@ -799,13 +799,13 @@
           ],
           "melanin": 0.05,
           "melanin_redness": 0.25,
-          "tint": "#e2c4bc",
           "roughness": 0.32,
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
           "coat": 0.0,
           "ior": 1.55,
           "opaque_share": 0.6,
+          "tint": "#e2c4bc",
           "opaque_color": "#e4c9a8"
         }
       ],
@@ -1706,13 +1706,13 @@
           ],
           "melanin": 0.05,
           "melanin_redness": 0.25,
-          "tint": "#e2c4bc",
           "roughness": 0.32,
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
           "coat": 0.0,
           "ior": 1.55,
           "opaque_share": 0.6,
+          "tint": "#e2c4bc",
           "opaque_color": "#e4c9a8"
         }
       ],
@@ -1853,13 +1853,13 @@
           ],
           "melanin": 0.05,
           "melanin_redness": 0.25,
-          "tint": "#e2c4bc",
           "roughness": 0.32,
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
           "coat": 0.0,
           "ior": 1.55,
           "opaque_share": 0.6,
+          "tint": "#e2c4bc",
           "opaque_color": "#e4c9a8"
         }
       ],
@@ -2054,61 +2054,63 @@
         "palm": [
           -0.6000000238418579,
           -0.7599999904632568,
-          1.7000000476837158
+          1.7300000190734863
         ],
         "palm_radii": [
           0.27,
           0.25,
-          0.24
+          0.28
         ],
         "palm_roll_degrees": -20,
         "finger_tips": [
           [
-            -0.31480810046195984,
+            -0.32991060614585876,
             -0.8799999952316284,
-            1.9059933423995972
+            1.8368278741836548
           ],
           [
-            -0.29600316286087036,
+            -0.31060659885406494,
             -0.8799999952316284,
-            1.7872636318206787
+            1.769506812095642
           ],
           [
-            -0.23409061133861542,
+            -0.2840961217880249,
             -0.8799999952316284,
-            1.6842238903045654
+            1.7174770832061768
           ]
         ],
-        "finger_radius": 0.08,
-        "finger_length": 0.1,
+        "finger_radius": 0.1,
+        "finger_length": 0.06,
         "thumb": [
           [
-            -0.699999988079071,
+            -0.6800000071525574,
             -0.7599999904632568,
-            1.8600000143051147
+            1.8799999952316284
           ],
           [
-            -0.6000000238418579,
-            -0.8399999737739563,
-            1.9800000190734863
+            -0.6299999952316284,
+            -0.800000011920929,
+            1.9700000286102295
           ]
         ],
-        "thumb_radius": 0.08,
+        "thumb_radius": 0.095,
         "metaball_resolution": 0.01,
+        "metaball_stiffness": 1.6,
+        "thumb_stiffness": 2.4,
         "orb_contact": {
           "radius": 0.262,
-          "smooth_max_blend": 0.025
+          "smooth_max_blend": 0.045
         }
       },
       "materials": [
         {
-          "name": "Warm beige plush",
+          "name": "Paw plush",
           "base_color": [
-            0.3662525955988395,
-            0.24620132670783548,
-            0.18782077230067787
+            0.45078578283822346,
+            0.31398871337571754,
+            0.24620132670783548
           ],
-          "base_color_srgb_hex": "#a38878",
+          "base_color_srgb_hex": "#b39888",
           "roughness": 0.91,
           "metallic": 0,
           "transmission": 0,
@@ -2116,9 +2118,9 @@
           "sheen": 1.0,
           "emission": {
             "color": [
-              0.3662525955988395,
-              0.24620132670783548,
-              0.18782077230067787
+              0.45078578283822346,
+              0.31398871337571754,
+              0.24620132670783548
             ],
             "strength": 0
           },
@@ -2134,35 +2136,35 @@
           "sheen_tint_srgb_hex": "#e8d2b8"
         },
         {
-          "name": "Long pile faux fur",
+          "name": "Paw faux fur",
           "type": "principled_hair_chiang",
           "parametrization": "melanin",
-          "base_color_srgb_hex": "#e2c4bc",
+          "base_color_srgb_hex": "#ecd4ca",
           "base_color": [
-            0.7605245046752924,
-            0.5520114015120001,
-            0.5028864580325687
+            0.83879901174074,
+            0.6583748172794485,
+            0.5906188409193369
           ],
           "melanin": 0.05,
           "melanin_redness": 0.25,
-          "tint": "#e2c4bc",
           "roughness": 0.32,
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
           "coat": 0.0,
           "ior": 1.55,
           "opaque_share": 0.6,
-          "opaque_color": "#e4c9a8"
+          "tint": "#ecd4ca",
+          "opaque_color": "#eed8bc"
         }
       ],
       "material": {
-        "name": "Warm beige plush",
+        "name": "Paw plush",
         "base_color": [
-          0.3662525955988395,
-          0.24620132670783548,
-          0.18782077230067787
+          0.45078578283822346,
+          0.31398871337571754,
+          0.24620132670783548
         ],
-        "base_color_srgb_hex": "#a38878",
+        "base_color_srgb_hex": "#b39888",
         "roughness": 0.91,
         "metallic": 0,
         "transmission": 0,
@@ -2170,9 +2172,9 @@
         "sheen": 1.0,
         "emission": {
           "color": [
-            0.3662525955988395,
-            0.24620132670783548,
-            0.18782077230067787
+            0.45078578283822346,
+            0.31398871337571754,
+            0.24620132670783548
           ],
           "strength": 0
         },
@@ -2187,12 +2189,12 @@
         },
         "sheen_tint_srgb_hex": "#e8d2b8"
       },
-      "vertices": 15280,
-      "polygons": 18847,
+      "vertices": 16168,
+      "polygons": 19965,
       "dimensions": [
-        0.710943341255188,
-        0.499822199344635,
-        0.6033139228820801
+        0.6884569525718689,
+        0.4998388886451721,
+        0.6276021003723145
       ]
     },
     {
@@ -2244,61 +2246,63 @@
         "palm": [
           0.6000000238418579,
           -0.7599999904632568,
-          1.7000000476837158
+          1.7300000190734863
         ],
         "palm_radii": [
           0.27,
           0.25,
-          0.24
+          0.28
         ],
         "palm_roll_degrees": 20,
         "finger_tips": [
           [
-            0.31480810046195984,
+            0.32991060614585876,
             -0.8799999952316284,
-            1.9059933423995972
+            1.8368278741836548
           ],
           [
-            0.29600316286087036,
+            0.31060659885406494,
             -0.8799999952316284,
-            1.7872636318206787
+            1.769506812095642
           ],
           [
-            0.23409061133861542,
+            0.2840961217880249,
             -0.8799999952316284,
-            1.6842238903045654
+            1.7174770832061768
           ]
         ],
-        "finger_radius": 0.08,
-        "finger_length": 0.1,
+        "finger_radius": 0.1,
+        "finger_length": 0.06,
         "thumb": [
           [
-            0.699999988079071,
+            0.6800000071525574,
             -0.7599999904632568,
-            1.8600000143051147
+            1.8799999952316284
           ],
           [
-            0.6000000238418579,
-            -0.8399999737739563,
-            1.9800000190734863
+            0.6299999952316284,
+            -0.800000011920929,
+            1.9700000286102295
           ]
         ],
-        "thumb_radius": 0.08,
+        "thumb_radius": 0.095,
         "metaball_resolution": 0.01,
+        "metaball_stiffness": 1.6,
+        "thumb_stiffness": 2.4,
         "orb_contact": {
           "radius": 0.262,
-          "smooth_max_blend": 0.025
+          "smooth_max_blend": 0.045
         }
       },
       "materials": [
         {
-          "name": "Warm beige plush",
+          "name": "Paw plush",
           "base_color": [
-            0.3662525955988395,
-            0.24620132670783548,
-            0.18782077230067787
+            0.45078578283822346,
+            0.31398871337571754,
+            0.24620132670783548
           ],
-          "base_color_srgb_hex": "#a38878",
+          "base_color_srgb_hex": "#b39888",
           "roughness": 0.91,
           "metallic": 0,
           "transmission": 0,
@@ -2306,9 +2310,9 @@
           "sheen": 1.0,
           "emission": {
             "color": [
-              0.3662525955988395,
-              0.24620132670783548,
-              0.18782077230067787
+              0.45078578283822346,
+              0.31398871337571754,
+              0.24620132670783548
             ],
             "strength": 0
           },
@@ -2324,35 +2328,35 @@
           "sheen_tint_srgb_hex": "#e8d2b8"
         },
         {
-          "name": "Long pile faux fur",
+          "name": "Paw faux fur",
           "type": "principled_hair_chiang",
           "parametrization": "melanin",
-          "base_color_srgb_hex": "#e2c4bc",
+          "base_color_srgb_hex": "#ecd4ca",
           "base_color": [
-            0.7605245046752924,
-            0.5520114015120001,
-            0.5028864580325687
+            0.83879901174074,
+            0.6583748172794485,
+            0.5906188409193369
           ],
           "melanin": 0.05,
           "melanin_redness": 0.25,
-          "tint": "#e2c4bc",
           "roughness": 0.32,
           "radial_roughness": 0.4,
           "random_roughness": 0.3,
           "coat": 0.0,
           "ior": 1.55,
           "opaque_share": 0.6,
-          "opaque_color": "#e4c9a8"
+          "tint": "#ecd4ca",
+          "opaque_color": "#eed8bc"
         }
       ],
       "material": {
-        "name": "Warm beige plush",
+        "name": "Paw plush",
         "base_color": [
-          0.3662525955988395,
-          0.24620132670783548,
-          0.18782077230067787
+          0.45078578283822346,
+          0.31398871337571754,
+          0.24620132670783548
         ],
-        "base_color_srgb_hex": "#a38878",
+        "base_color_srgb_hex": "#b39888",
         "roughness": 0.91,
         "metallic": 0,
         "transmission": 0,
@@ -2360,9 +2364,9 @@
         "sheen": 1.0,
         "emission": {
           "color": [
-            0.3662525955988395,
-            0.24620132670783548,
-            0.18782077230067787
+            0.45078578283822346,
+            0.31398871337571754,
+            0.24620132670783548
           ],
           "strength": 0
         },
@@ -2377,12 +2381,12 @@
         },
         "sheen_tint_srgb_hex": "#e8d2b8"
       },
-      "vertices": 15280,
-      "polygons": 18847,
+      "vertices": 16168,
+      "polygons": 19965,
       "dimensions": [
-        0.710943341255188,
-        0.499822199344635,
-        0.6033141613006592
+        0.6884570121765137,
+        0.4998388886451721,
+        0.6276021003723145
       ]
     },
     {
@@ -9142,7 +9146,7 @@
         2.3
       ],
       "arm_length": 0.05,
-      "paw_length": 0.042,
+      "paw_length": 0.06,
       "leg_length": 0.07,
       "root_radius": 0.0032,
       "tip_radius_factor": 0.1,
@@ -9201,51 +9205,51 @@
     },
     "systems": {
       "Body": {
-        "parents": 1916,
+        "parents": 1908,
         "children_per_parent": 100,
-        "rendered_strands": 191600,
+        "rendered_strands": 190800,
         "density_vertex_group": true,
         "surface_area_m2": 15.8193
       },
       "Arm Left": {
-        "parents": 155,
+        "parents": 154,
         "children_per_parent": 100,
-        "rendered_strands": 15500,
+        "rendered_strands": 15400,
         "density_vertex_group": true,
         "surface_area_m2": 1.2808
       },
       "Hand Left": {
-        "parents": 122,
+        "parents": 128,
         "children_per_parent": 100,
-        "rendered_strands": 12200,
+        "rendered_strands": 12800,
         "density_vertex_group": true,
-        "surface_area_m2": 1.0126
+        "surface_area_m2": 1.0643
       },
       "Foot Left": {
-        "parents": 264,
+        "parents": 263,
         "children_per_parent": 100,
-        "rendered_strands": 26400,
+        "rendered_strands": 26300,
         "density_vertex_group": true,
         "surface_area_m2": 2.1807
       },
       "Arm Right": {
-        "parents": 155,
+        "parents": 154,
         "children_per_parent": 100,
-        "rendered_strands": 15500,
+        "rendered_strands": 15400,
         "density_vertex_group": true,
         "surface_area_m2": 1.2808
       },
       "Hand Right": {
-        "parents": 122,
+        "parents": 128,
         "children_per_parent": 100,
-        "rendered_strands": 12200,
+        "rendered_strands": 12800,
         "density_vertex_group": true,
-        "surface_area_m2": 1.0126
+        "surface_area_m2": 1.0643
       },
       "Foot Right": {
-        "parents": 264,
+        "parents": 263,
         "children_per_parent": 100,
-        "rendered_strands": 26400,
+        "rendered_strands": 26300,
         "density_vertex_group": true,
         "surface_area_m2": 2.1807
       }
